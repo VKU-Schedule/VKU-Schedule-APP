@@ -1,0 +1,342 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+
+import '../../../core/widgets/bottom_nav.dart';
+import '../../../models/saved_schedule.dart';
+import '../../options/providers/saved_schedules_provider.dart';
+import '../../options/providers/chosen_option_provider.dart';
+
+class SavedSchedulesPage extends ConsumerWidget {
+  const SavedSchedulesPage({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final savedSchedules = ref.watch(savedSchedulesProvider);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Lịch đã lưu'),
+        actions: [
+          if (savedSchedules.isNotEmpty)
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: () {
+                ref.read(savedSchedulesProvider.notifier).refresh();
+              },
+              tooltip: 'Làm mới',
+            ),
+        ],
+      ),
+      body: savedSchedules.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.bookmark_border,
+                    size: 64,
+                    color: Colors.grey[400],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Chưa có lịch đã lưu',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: Colors.grey[600],
+                        ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Lưu các phương án bạn muốn xem sau',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.grey[500],
+                        ),
+                  ),
+                ],
+              ),
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: savedSchedules.length,
+              itemBuilder: (context, index) {
+                final saved = savedSchedules[index];
+                final scheduleOption =
+                    ref.read(savedSchedulesProvider.notifier).getScheduleOption(saved.id);
+
+                return _SavedScheduleCard(
+                  index: index + 1,
+                  saved: saved,
+                  scheduleOption: scheduleOption,
+                  onView: () {
+                    if (scheduleOption != null) {
+                      ref
+                          .read(chosenOptionProvider.notifier)
+                          .selectOption(scheduleOption);
+                      context.go('/timetable');
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Không thể tải lịch này'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  },
+                  onDelete: () async {
+                    final confirm = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Xóa lịch đã lưu'),
+                        content: const Text('Bạn có chắc muốn xóa lịch này?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            child: const Text('Hủy'),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.red,
+                            ),
+                            child: const Text('Xóa'),
+                          ),
+                        ],
+                      ),
+                    );
+
+                    if (confirm == true && context.mounted) {
+                      try {
+                        await ref
+                            .read(savedSchedulesProvider.notifier)
+                            .deleteSchedule(saved.id);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Đã xóa lịch'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Lỗi khi xóa: $e'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      }
+                    }
+                  },
+                );
+              },
+            ),
+      bottomNavigationBar: const BottomNavBar(currentRoute: '/saved-schedules'),
+    );
+  }
+}
+
+class _SavedScheduleCard extends StatelessWidget {
+  final int index;
+  final SavedSchedule saved;
+  final dynamic scheduleOption; // ScheduleOption?
+  final VoidCallback onView;
+  final VoidCallback onDelete;
+
+  const _SavedScheduleCard({
+    required this.index,
+    required this.saved,
+    required this.scheduleOption,
+    required this.onView,
+    required this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final dateFormat = DateFormat('dd/MM/yyyy HH:mm');
+    final savedAtText = dateFormat.format(saved.savedAt);
+
+    int sessionCount = 0;
+    double score = 0.0;
+    if (scheduleOption != null) {
+      sessionCount = scheduleOption.sessions.length;
+      score = scheduleOption.score;
+    }
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.bookmark,
+                    color: theme.colorScheme.primary,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Phương án $index',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.access_time,
+                            size: 14,
+                            color: Colors.grey[600],
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            savedAtText,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                if (saved.isActive)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.green[100],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.check_circle,
+                          color: Colors.green,
+                          size: 14,
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          'Đang dùng',
+                          style: TextStyle(
+                            color: Colors.green,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+            if (scheduleOption != null) ...[
+              const SizedBox(height: 12),
+              const Divider(),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  _buildInfoChip(
+                    context,
+                    Icons.event,
+                    '$sessionCount buổi',
+                    Colors.blue,
+                  ),
+                  const SizedBox(width: 8),
+                  _buildInfoChip(
+                    context,
+                    Icons.star,
+                    'Điểm: ${score.toStringAsFixed(1)}',
+                    Colors.orange,
+                  ),
+                ],
+              ),
+            ],
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: onView,
+                    icon: const Icon(Icons.visibility, size: 18),
+                    label: const Text('Xem lịch'),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: onDelete,
+                    icon: const Icon(Icons.delete_outline, size: 18),
+                    label: const Text('Xóa'),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      foregroundColor: Colors.red,
+                      side: const BorderSide(color: Colors.red),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoChip(
+    BuildContext context,
+    IconData icon,
+    String text,
+    Color color,
+  ) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 4),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 12,
+              color: color,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
