@@ -4,10 +4,16 @@ import 'package:go_router/go_router.dart';
 
 import '../../../features/optimization/providers/optimization_provider.dart';
 import '../../../features/options/providers/chosen_option_provider.dart';
+import '../../../models/schedule_option.dart';
 import 'comparison_grid.dart';
 
 class ComparisonPage extends ConsumerStatefulWidget {
-  const ComparisonPage({super.key});
+  final List<ScheduleOption>? providedOptions; // Options từ saved schedules
+  
+  const ComparisonPage({
+    super.key,
+    this.providedOptions,
+  });
 
   @override
   ConsumerState<ComparisonPage> createState() => _ComparisonPageState();
@@ -18,7 +24,10 @@ class _ComparisonPageState extends ConsumerState<ComparisonPage> {
 
   @override
   Widget build(BuildContext context) {
-    final optionsAsync = ref.watch(optimizationProvider);
+    // Sử dụng providedOptions nếu có, nếu không thì lấy từ optimization provider
+    final optionsAsync = widget.providedOptions != null
+        ? AsyncValue.data(widget.providedOptions!)
+        : ref.watch(optimizationProvider);
     final chosenOption = ref.watch(chosenOptionProvider);
 
     return Scaffold(
@@ -87,17 +96,17 @@ class _ComparisonPageState extends ConsumerState<ComparisonPage> {
               ),
               Expanded(
                 child: _selectedOptionIds.length < 2
-                    ? Center(
+                    ? const Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.compare_arrows,
                               size: 64,
                               color: Colors.grey,
                             ),
-                            const SizedBox(height: 16),
-                            const Text(
+                            SizedBox(height: 16),
+                            Text(
                               'Chọn ít nhất 2 phương án để so sánh',
                             ),
                           ],

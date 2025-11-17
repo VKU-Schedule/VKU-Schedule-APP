@@ -2,53 +2,76 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/theme/app_theme.dart';
+import '../../subjects/providers/subject_selection_provider.dart';
+import '../../options/providers/saved_schedules_provider.dart';
 import '../../../core/widgets/bottom_nav.dart';
+import '../widgets/hero_section.dart';
+import '../widgets/stats_cards.dart';
+import '../widgets/quick_actions.dart';
 
-class HomePage extends ConsumerWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends ConsumerState<HomePage>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    );
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final subjectSelection = ref.watch(subjectSelectionProvider);
+    final savedSchedules = ref.watch(savedSchedulesProvider);
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Trang chủ'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.schedule,
-              size: 80,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Tối ưu hóa lịch học',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Tạo lịch học tối ưu cho bạn',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Colors.grey[600],
-                  ),
-            ),
-            const SizedBox(height: 48),
-            SizedBox(
-              width: 200,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  context.push('/subjects');
-                },
-                icon: const Icon(Icons.play_arrow),
-                label: const Text('Bắt đầu'),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
+      backgroundColor: AppTheme.backgroundGrey,
+      body: SafeArea(
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            // Hero Section with VKU Branding
+            SliverToBoxAdapter(
+              child: HeroSection(
+                animationController: _animationController,
+                onGetStarted: () => context.push('/subjects'),
               ),
+            ),
+
+            // Stats Cards with Glassmorphism
+            SliverToBoxAdapter(
+              child: StatsCards(
+                enrolledSubjectsCount: subjectSelection.enrolledSubjects.length,
+                savedSchedulesCount: savedSchedules.length,
+              ),
+            ),
+
+            // Quick Actions Section
+            const SliverToBoxAdapter(
+              child: QuickActionsSection(),
+            ),
+
+            // Bottom padding
+            const SliverToBoxAdapter(
+              child: SizedBox(height: 100),
             ),
           ],
         ),
@@ -57,4 +80,3 @@ class HomePage extends ConsumerWidget {
     );
   }
 }
-

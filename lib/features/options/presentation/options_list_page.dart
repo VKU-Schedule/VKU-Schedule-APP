@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../../core/widgets/bottom_nav.dart';
 import '../../../features/optimization/providers/optimization_provider.dart';
 import '../../../features/optimization/providers/optimization_history_provider.dart';
+import '../../../features/comparison/providers/comparison_options_provider.dart';
 import '../../../models/schedule_option.dart';
 import '../../../models/optimization_history.dart';
 import '../../../models/saved_schedule.dart';
@@ -122,7 +123,9 @@ class _OptionsListPageState extends ConsumerState<OptionsListPage> {
                               .selectOption(option);
                           context.go('/timetable');
                         },
-                        onCompare: () {
+                        onCompare: (List<ScheduleOption> options) {
+                          // Store options in comparison provider
+                          ref.read(comparisonOptionsProvider.notifier).state = options;
                           context.push('/compare');
                         },
                         onSave: (option) async {
@@ -369,12 +372,12 @@ class _OptionsListPageState extends ConsumerState<OptionsListPage> {
   }
 }
 
-class _HistoryItem extends StatefulWidget {
+class _HistoryItem extends ConsumerStatefulWidget {
   final OptimizationHistory history;
   final ScheduleOption? chosenOptionId;
   final List<SavedSchedule> savedSchedules;
   final Function(ScheduleOption) onViewDetails;
-  final VoidCallback onCompare;
+  final Function(List<ScheduleOption>) onCompare;
   final Function(ScheduleOption) onSave;
   final List<ScheduleOption> Function(String) getScheduleOptions;
 
@@ -389,10 +392,10 @@ class _HistoryItem extends StatefulWidget {
   });
 
   @override
-  State<_HistoryItem> createState() => _HistoryItemState();
+  ConsumerState<_HistoryItem> createState() => _HistoryItemState();
 }
 
-class _HistoryItemState extends State<_HistoryItem> {
+class _HistoryItemState extends ConsumerState<_HistoryItem> {
   bool _isExpanded = false;
   List<ScheduleOption>? _options;
 
@@ -448,7 +451,11 @@ class _HistoryItemState extends State<_HistoryItem> {
                 isSaved: isOptionSaved,
                 onSelect: () => widget.onSave(option),
                 onViewDetails: () => widget.onViewDetails(option),
-                onCompare: widget.onCompare,
+                onCompare: () {
+                  // Get all options for this history item and pass to onCompare
+                  final options = widget.getScheduleOptions(widget.history.id);
+                  widget.onCompare(options);
+                },
               );
             }),
           ],

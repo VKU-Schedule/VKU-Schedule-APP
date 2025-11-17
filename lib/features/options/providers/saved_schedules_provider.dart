@@ -32,7 +32,7 @@ class SavedSchedulesNotifier extends StateNotifier<List<SavedSchedule>> {
   }
 
   /// Save a schedule option to local storage
-  Future<void> saveSchedule(ScheduleOption option) async {
+  Future<void> saveSchedule(ScheduleOption option, {String? sessionId}) async {
     try {
       final scheduleJson = jsonEncode(option.toJson());
       final savedSchedule = SavedSchedule(
@@ -40,6 +40,7 @@ class SavedSchedulesNotifier extends StateNotifier<List<SavedSchedule>> {
         scheduleJson: scheduleJson,
         savedAt: DateTime.now(),
         isActive: false,
+        sessionId: sessionId,
       );
 
       await _localStorage.saveSchedule(savedSchedule);
@@ -57,6 +58,19 @@ class SavedSchedulesNotifier extends StateNotifier<List<SavedSchedule>> {
       _loadSavedSchedules();
     } catch (e) {
       print('[SavedSchedulesNotifier] Error deleting schedule: $e');
+      rethrow;
+    }
+  }
+
+  /// Delete multiple schedules by IDs
+  Future<void> deleteMultipleSchedules(List<String> ids) async {
+    try {
+      for (final id in ids) {
+        await _localStorage.deleteSchedule(id);
+      }
+      _loadSavedSchedules();
+    } catch (e) {
+      print('[SavedSchedulesNotifier] Error deleting multiple schedules: $e');
       rethrow;
     }
   }
