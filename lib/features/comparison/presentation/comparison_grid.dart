@@ -98,7 +98,7 @@ class ComparisonGrid extends StatelessWidget {
                     width: 40,
                     child: Center(
                       child: Text(
-                        '$period',
+                        '${period + 1}',
                         style: const TextStyle(fontSize: 10),
                       ),
                     ),
@@ -106,8 +106,8 @@ class ComparisonGrid extends StatelessWidget {
                   ...List.generate(7, (day) {
                     final daySessions = sessions.where((s) =>
                         s.dayIndex == day &&
-                        s.start <= period + 1 &&
-                        s.end >= period + 1).toList();
+                        s.startPeriod <= period + 1 &&
+                        s.endPeriod >= period + 1).toList();
 
                     if (daySessions.isEmpty) {
                       return Expanded(
@@ -176,4 +176,3 @@ class ComparisonGrid extends StatelessWidget {
     return colors[hash.abs() % colors.length];
   }
 }
-
