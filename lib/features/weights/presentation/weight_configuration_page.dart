@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/app_bar.dart';
 import '../../../core/widgets/vku_components.dart';
 import '../providers/weights_provider.dart';
 
@@ -15,8 +16,8 @@ class WeightConfigurationPage extends ConsumerWidget {
     final weights = ref.watch(weightsProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cấu hình trọng số'),
+      appBar: const VKUAppBar(
+        title: 'Cấu hình trọng số',
       ),
       body: SafeArea(
         child: ListView(

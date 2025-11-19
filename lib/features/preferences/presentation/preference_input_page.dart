@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/app_bar.dart';
 import '../../../core/widgets/vku_components.dart';
 import '../providers/preferences_provider.dart';
 
@@ -128,8 +129,8 @@ class _PreferenceInputPageState extends ConsumerState<PreferenceInputPage>
     final isOverLimit = characterCount > maxCharacters;
     
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Nhập sở thích'),
+      appBar: const VKUAppBar(
+        title: 'Nhập sở thích',
       ),
       body: SafeArea(
         child: FadeTransition(

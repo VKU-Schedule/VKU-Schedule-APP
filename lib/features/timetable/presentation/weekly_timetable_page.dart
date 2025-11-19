@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/widgets/app_bar.dart';
 import '../../../core/widgets/bottom_nav.dart';
 import '../../../core/widgets/weekly_grid.dart';
 import '../../../features/options/providers/chosen_option_provider.dart';
@@ -326,8 +327,8 @@ class _WeeklyTimetablePageState extends ConsumerState<WeeklyTimetablePage> {
 
     if (chosenOption == null || chosenOption.sessions.isEmpty) {
       return Scaffold(
-        appBar: AppBar(
-          title: const Text('Lịch tuần'),
+        appBar: const VKUAppBar(
+          title: 'Lịch tuần',
         ),
         body: Center(
           child: Column(
@@ -360,9 +361,8 @@ class _WeeklyTimetablePageState extends ConsumerState<WeeklyTimetablePage> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEditing ? 'Chỉnh sửa lịch' : 'Lịch tuần'),
-        elevation: 0,
+      appBar: VKUAppBar(
+        title: _isEditing ? 'Chỉnh sửa lịch' : 'Lịch tuần',
         actions: [
           if (_isEditing) ...[
             IconButton(

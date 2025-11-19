@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/di/providers.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/app_bar.dart';
 import '../../../core/widgets/vku_loading_animation.dart';
 import '../../../core/widgets/loading_content.dart';
 import '../../../core/widgets/error_states.dart';
@@ -139,8 +140,9 @@ class _OptimizationProcessingPageState
     final optimizationAsync = ref.watch(optimizationProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Đang tối ưu lịch học'),
+      appBar: VKUAppBar(
+        title: 'Đang tối ưu lịch học',
+        automaticallyImplyLeading: false,
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () {
@@ -149,6 +151,8 @@ class _OptimizationProcessingPageState
             });
             context.go('/subjects');
           },
+          tooltip: 'Hủy',
+          color: Colors.white,
         ),
       ),
       body: AnimatedGradientBackground(

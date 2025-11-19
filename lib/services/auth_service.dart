@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:vku_schedule/models/user_profile.dart';
 import 'package:vku_schedule/services/local_storage_service.dart';
@@ -9,7 +10,7 @@ class AuthService {
   final LocalStorageService _localStorage;
 
   // Stream controller for auth state changes
-  final _authStateController = StreamController<UserProfile?>.broadcast();
+  late final StreamController<UserProfile?> _authStateController;
 
   // Current user cache
   UserProfile? _currentUser;
@@ -26,6 +27,16 @@ class AuthService {
                 'https://www.googleapis.com/auth/calendar',
               ],
             ) {
+    // Initialize stream controller with onListen callback
+    _authStateController = StreamController<UserProfile?>.broadcast(
+      onListen: () {
+        // Emit current user when stream is first listened to
+        if (_currentUser != null) {
+          _authStateController.add(_currentUser);
+        }
+      },
+    );
+    
     // Load user from local storage on initialization
     _loadUserFromStorage();
   }
@@ -60,7 +71,10 @@ class AuthService {
 
       if (googleUser == null) {
         // User cancelled the sign-in
-        throw AuthException('Đăng nhập bị hủy');
+        throw AuthException(
+          'Đăng nhập bị hủy',
+          type: AuthErrorType.cancelled,
+        );
       }
 
       // Get authentication details
@@ -72,7 +86,10 @@ class AuthService {
       final String? idToken = googleAuth.idToken;
 
       if (accessToken == null || idToken == null) {
-        throw AuthException('Không thể lấy token xác thực');
+        throw AuthException(
+          'Không thể lấy token xác thực',
+          type: AuthErrorType.configError,
+        );
       }
 
       // Create user profile from Google account
@@ -95,8 +112,34 @@ class AuthService {
       return userProfile;
     } on AuthException {
       rethrow;
+    } on PlatformException catch (e) {
+      // Handle specific platform errors
+      if (e.code == 'network_error') {
+        throw AuthException(
+          'Không có kết nối mạng',
+          type: AuthErrorType.networkError,
+        );
+      } else if (e.code == 'sign_in_failed') {
+        throw AuthException(
+          'Cấu hình xác thực không hợp lệ',
+          type: AuthErrorType.configError,
+        );
+      } else if (e.code == 'sign_in_canceled') {
+        throw AuthException(
+          'Đăng nhập bị hủy',
+          type: AuthErrorType.cancelled,
+        );
+      } else {
+        throw AuthException(
+          'Đăng nhập thất bại: ${e.message ?? e.code}',
+          type: AuthErrorType.unknown,
+        );
+      }
     } catch (e) {
-      throw AuthException('Đăng nhập thất bại: ${e.toString()}');
+      throw AuthException(
+        'Đăng nhập thất bại: ${e.toString()}',
+        type: AuthErrorType.unknown,
+      );
     }
   }
 
@@ -209,6 +252,7 @@ class AuthService {
           await _googleSignIn.signInSilently();
 
       if (googleUser == null) {
+        // No cached sign-in, return null gracefully
         return null;
       }
 
@@ -238,8 +282,13 @@ class AuthService {
       _authStateController.add(userProfile);
 
       return userProfile;
+    } on PlatformException catch (e) {
+      // Silent sign-in failed due to platform error, return null gracefully
+      // User will need to sign in manually
+      return null;
     } catch (e) {
-      // Silent sign-in failed, user needs to sign in manually
+      // Silent sign-in failed for any other reason, return null gracefully
+      // User will need to sign in manually
       return null;
     }
   }
@@ -272,11 +321,23 @@ class AuthService {
   }
 }
 
+/// Error types for authentication
+enum AuthErrorType {
+  cancelled,           // User cancelled sign-in
+  networkError,        // No internet connection
+  configError,         // OAuth configuration invalid
+  permissionDenied,    // User denied permissions
+  serviceUnavailable,  // Google Sign-In service down
+  tokenExpired,        // Token expired and refresh failed
+  unknown,             // Unknown error
+}
+
 /// Custom exception for authentication errors
 class AuthException implements Exception {
   final String message;
+  final AuthErrorType type;
 
-  AuthException(this.message);
+  AuthException(this.message, {this.type = AuthErrorType.unknown});
 
   @override
   String toString() => 'AuthException: $message';

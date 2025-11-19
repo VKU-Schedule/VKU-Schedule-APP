@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/app_bar.dart';
 import '../../../core/widgets/subject_card.dart';
 import '../../../models/subject.dart';
 import '../providers/subject_selection_provider.dart';
@@ -69,8 +70,8 @@ class _SubjectSelectionPageState extends ConsumerState<SubjectSelectionPage> {
     final selection = ref.watch(subjectSelectionProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Chọn môn học'),
+      appBar: const VKUAppBar(
+        title: 'Chọn môn học',
       ),
       body: Column(
         children: [

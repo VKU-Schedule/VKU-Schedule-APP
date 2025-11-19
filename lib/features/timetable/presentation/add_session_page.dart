@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/di/providers.dart';
+import '../../../core/widgets/app_bar.dart';
 import '../../../models/api_subject.dart';
 import '../../../models/session.dart';
 
@@ -168,8 +169,8 @@ class _AddSessionPageState extends ConsumerState<AddSessionPage> {
     final hasConflict = _hasConflict();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Thêm môn học'),
+      appBar: const VKUAppBar(
+        title: 'Thêm môn học',
       ),
       body: Form(
         key: _formKey,

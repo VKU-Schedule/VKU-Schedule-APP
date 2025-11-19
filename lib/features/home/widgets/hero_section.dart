@@ -139,7 +139,7 @@ class HeroSection extends StatelessWidget {
                         ),
                         const SizedBox(height: AppTheme.spaceSm),
                         Text(
-                          'Tối ưu hóa lịch học của bạn',
+                          'Cá nhân hóa lịch học của bạn',
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.white.withValues(alpha: 0.9),
