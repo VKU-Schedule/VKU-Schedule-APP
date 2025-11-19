@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../core/widgets/app_bar.dart';
 import '../../../core/widgets/bottom_nav.dart';
 import '../../../models/saved_schedule.dart';
+import '../../../models/schedule_option.dart';
 import '../../options/providers/saved_schedules_provider.dart';
 import '../../options/providers/chosen_option_provider.dart';
 import '../../comparison/presentation/comparison_page.dart';
@@ -24,8 +26,9 @@ class SavedSchedulesPage extends ConsumerWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Lịch đã lưu'),
+      appBar: VKUAppBar(
+        title: 'Lịch đã lưu',
+        automaticallyImplyLeading: false, // Root page - no back button
         actions: [
           if (savedSchedules.isNotEmpty)
             IconButton(
@@ -331,7 +334,8 @@ class _SessionGroup extends ConsumerWidget {
                   // Lấy tất cả schedule options
                   final options = schedules
                       .map((s) => ref.read(savedSchedulesProvider.notifier).getScheduleOption(s.id))
-                      .whereType<dynamic>() // Filter out nulls
+                      .where((option) => option != null)
+                      .cast<ScheduleOption>()
                       .toList();
                   
                   if (options.length >= 2) {
@@ -339,7 +343,7 @@ class _SessionGroup extends ConsumerWidget {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => ComparisonPage(
-                          providedOptions: options.cast(),
+                          providedOptions: options,
                         ),
                       ),
                     );

@@ -43,38 +43,39 @@ class _HomePageState extends ConsumerState<HomePage>
     final savedSchedules = ref.watch(savedSchedulesProvider);
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundGrey,
-      body: SafeArea(
-        child: CustomScrollView(
-          physics: const BouncingScrollPhysics(),
-          slivers: [
-            // Hero Section with VKU Branding
-            SliverToBoxAdapter(
-              child: HeroSection(
-                animationController: _animationController,
-                onGetStarted: () => context.push('/subjects'),
-              ),
-            ),
+      // backgroundColor: AppTheme.backgroundGrey,
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+      
+        slivers: [
+          
 
-            // Stats Cards with Glassmorphism
-            SliverToBoxAdapter(
-              child: StatsCards(
-                enrolledSubjectsCount: subjectSelection.enrolledSubjects.length,
-                savedSchedulesCount: savedSchedules.length,
-              ),
+          // Hero Section with VKU Branding
+          SliverToBoxAdapter(
+            child: HeroSection(
+              animationController: _animationController,
+              onGetStarted: () => context.push('/subjects'),
             ),
+          ),
 
-            // Quick Actions Section
-            const SliverToBoxAdapter(
-              child: QuickActionsSection(),
+          // Stats Cards with Glassmorphism
+          SliverToBoxAdapter(
+            child: StatsCards(
+              enrolledSubjectsCount: subjectSelection.enrolledSubjects.length,
+              savedSchedulesCount: savedSchedules.length,
             ),
+          ),
 
-            // Bottom padding
-            const SliverToBoxAdapter(
-              child: SizedBox(height: 100),
-            ),
-          ],
-        ),
+          // Quick Actions Section
+          const SliverToBoxAdapter(
+            child: QuickActionsSection(),
+          ),
+
+          // Bottom padding
+          const SliverToBoxAdapter(
+            child: SizedBox(height: 100),
+          ),
+        ],
       ),
       bottomNavigationBar: const BottomNavBar(currentRoute: '/home'),
     );

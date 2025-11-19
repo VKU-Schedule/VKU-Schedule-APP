@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
+import '../../../core/widgets/app_bar.dart';
 import '../../../features/optimization/providers/optimization_provider.dart';
 import '../../../features/options/providers/chosen_option_provider.dart';
 import '../../../models/schedule_option.dart';
@@ -21,6 +21,7 @@ class ComparisonPage extends ConsumerStatefulWidget {
 
 class _ComparisonPageState extends ConsumerState<ComparisonPage> {
   final Set<String> _selectedOptionIds = {};
+  bool _initialized = false;
 
   @override
   Widget build(BuildContext context) {
@@ -31,15 +32,8 @@ class _ComparisonPageState extends ConsumerState<ComparisonPage> {
     final chosenOption = ref.watch(chosenOptionProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('So sánh lịch học'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            // Go back to options page
-            context.go('/options');
-          },
-        ),
+      appBar: const VKUAppBar(
+        title: 'So sánh lịch học',
       ),
       body: optionsAsync.when(
         data: (options) {
@@ -49,9 +43,18 @@ class _ComparisonPageState extends ConsumerState<ComparisonPage> {
             );
           }
 
-          // Initialize selection with chosen option if available
-          if (chosenOption != null && _selectedOptionIds.isEmpty) {
-            _selectedOptionIds.add(chosenOption.id);
+          // Initialize selection
+          if (!_initialized) {
+            _initialized = true;
+            if (widget.providedOptions != null) {
+              // Tự động chọn 2 phương án đầu tiên khi có providedOptions
+              _selectedOptionIds.addAll(
+                options.take(2).map((opt) => opt.id),
+              );
+            } else if (chosenOption != null) {
+              // Chọn chosenOption nếu đến từ optimization flow
+              _selectedOptionIds.add(chosenOption.id);
+            }
           }
 
           return Column(

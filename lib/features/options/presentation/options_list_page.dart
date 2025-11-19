@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../core/widgets/app_bar.dart';
 import '../../../core/widgets/bottom_nav.dart';
 import '../../../features/optimization/providers/optimization_provider.dart';
 import '../../../features/optimization/providers/optimization_history_provider.dart';
@@ -33,14 +34,15 @@ class _OptionsListPageState extends ConsumerState<OptionsListPage> {
     final optimizationHistory = ref.watch(optimizationHistoryProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Danh sách phương án'),
+      appBar: VKUAppBar(
+        title: 'Danh sách phương án',
         actions: [
           IconButton(
             icon: const Icon(Icons.filter_list),
             onPressed: () {
               _showSortDialog(context);
             },
+            tooltip: 'Sắp xếp',
           ),
         ],
       ),

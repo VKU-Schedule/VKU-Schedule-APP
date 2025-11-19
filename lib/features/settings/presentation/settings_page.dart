@@ -3,11 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/app_bar.dart';
 import '../../../core/widgets/bottom_nav.dart';
 import '../../../core/widgets/vku_card.dart';
 import '../../../features/auth/providers/auth_provider.dart';
 import '../../../features/options/providers/saved_schedules_provider.dart';
-import '../../../services/local_storage_service.dart';
 import '../../../core/di/providers.dart';
 import '../../../models/app_settings.dart';
 import '../providers/settings_provider.dart';
@@ -82,96 +82,80 @@ class _SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPr
   }
 
   Widget _buildHeroSection(BuildContext context, dynamic currentUser) {
-    return SliverAppBar(
-      expandedHeight: 280,
+    return VKUSliverAppBar(
+      title: 'Cài đặt',
+      expandedHeight: 300,
       pinned: true,
-      backgroundColor: AppTheme.vkuNavy,
-      flexibleSpace: FlexibleSpaceBar(
-        background: Container(
-          decoration: const BoxDecoration(
-            gradient: AppTheme.gradientNavyToRed,
+      automaticallyImplyLeading: false, // Settings is a root page
+      flexibleSpace: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppTheme.spaceLg,
+            AppTheme.space3xl,
+            AppTheme.spaceLg,
+            AppTheme.spaceMd,
           ),
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(AppTheme.spaceLg),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(height: AppTheme.space2xl),
-                  _buildAvatar(currentUser),
-                  const SizedBox(height: AppTheme.spaceMd),
-                  if (currentUser != null) ...[
-                    Text(
-                      currentUser.name,
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              _buildAvatar(currentUser),
+              const SizedBox(height: AppTheme.spaceMd),
+              if (currentUser != null) ...[
+                Text(
+                  currentUser.name,
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: AppTheme.spaceXs),
+                Text(
+                  currentUser.email,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Colors.white.withValues(alpha: 0.9),
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (currentUser.studentId != null) ...[
+                  const SizedBox(height: AppTheme.spaceXs),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppTheme.spaceMd,
+                      vertical: AppTheme.spaceXs,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Text(
+                      'MSSV: ${currentUser.studentId}',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: AppTheme.spaceXs),
-                    Text(
-                      currentUser.email,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.white.withValues(alpha: 0.9),
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    if (currentUser.studentId != null) ...[
-                      const SizedBox(height: AppTheme.spaceXs),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppTheme.spaceMd,
-                          vertical: AppTheme.spaceXs,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.3),
-                          ),
-                        ),
-                        child: Text(
-                          'MSSV: ${currentUser.studentId}',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ] else ...[
-                    Text(
-                      'Chưa đăng nhập',
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                  ],
-                  const SizedBox(height: AppTheme.spaceMd),
-                  if (currentUser != null)
-                    TextButton.icon(
-                      onPressed: () => _showEditProfileDialog(context, currentUser),
-                      icon: const Icon(Icons.edit, size: 16, color: Colors.white),
-                      label: const Text(
-                        'Chỉnh sửa thông tin',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      style: TextButton.styleFrom(
-                        backgroundColor: Colors.white.withValues(alpha: 0.2),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppTheme.spaceMd,
-                          vertical: AppTheme.spaceSm,
-                        ),
-                      ),
-                    ),
+                  ),
                 ],
-              ),
-            ),
+              ] else ...[
+                Text(
+                  'Chưa đăng nhập',
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+              const SizedBox(height: AppTheme.space2xl),
+            ],
           ),
         ),
-        title: const Text('Cài đặt'),
-        centerTitle: true,
       ),
     );
   }
@@ -390,18 +374,16 @@ class _SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPr
               onTap: () => _showCreditsDialog(context),
               trailing: const Icon(Icons.chevron_right),
             ),
-            if (currentUser != null) ...[
-              const Divider(height: 1),
-              _buildSettingTile(
-                context: context,
-                icon: Icons.logout,
-                title: 'Đăng xuất',
-                subtitle: 'Thoát khỏi tài khoản',
-                onTap: () => _showLogoutDialog(context, ref),
-                iconColor: AppTheme.error,
-                titleColor: AppTheme.error,
-              ),
-            ],
+            const Divider(height: 1),
+            _buildSettingTile(
+              context: context,
+              icon: Icons.logout,
+              title: 'Đăng xuất',
+              subtitle: 'Thoát khỏi tài khoản',
+              onTap: () => _showLogoutDialog(context, ref),
+              iconColor: AppTheme.error,
+              titleColor: AppTheme.error,
+            ),
           ],
         ),
       ),
@@ -718,7 +700,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPr
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Đăng xuất'),
+        title: const Text('Xác nhận đăng xuất'),
         content: const Text('Bạn có chắc chắn muốn đăng xuất?'),
         actions: [
           TextButton(
@@ -726,13 +708,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPr
             child: const Text('Hủy'),
           ),
           FilledButton(
-            onPressed: () async {
-              await ref.read(authNotifierProvider.notifier).signOut();
-              if (context.mounted) {
-                Navigator.pop(context);
-                context.go('/login');
-              }
-            },
+            onPressed: () => _handleSignOut(context, ref),
             style: FilledButton.styleFrom(
               backgroundColor: AppTheme.error,
             ),
@@ -741,6 +717,56 @@ class _SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPr
         ],
       ),
     );
+  }
+
+  Future<void> _handleSignOut(BuildContext context, WidgetRef ref) async {
+    // Close the confirmation dialog
+    Navigator.pop(context);
+    
+    // Show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: Card(
+          child: Padding(
+            padding: EdgeInsets.all(AppTheme.spaceLg),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: AppTheme.spaceMd),
+                Text('Đang đăng xuất...'),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    try {
+      await ref.read(authNotifierProvider.notifier).signOut();
+      
+      if (context.mounted) {
+        // Close loading dialog
+        Navigator.pop(context);
+        // Navigate to login page
+        context.go('/login');
+      }
+    } catch (e) {
+      if (context.mounted) {
+        // Close loading dialog
+        Navigator.pop(context);
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Đăng xuất thất bại: ${e.toString()}'),
+            backgroundColor: AppTheme.error,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    }
   }
 
   void _showAboutDialog(BuildContext context) {

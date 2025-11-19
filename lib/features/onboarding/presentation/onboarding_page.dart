@@ -79,7 +79,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                       );
                       
                       if (mounted) {
-                        context.go('/subjects');
+                        context.go('/home');
                       }
                     }
                   },
@@ -100,7 +100,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                 );
                 
                 if (mounted) {
-                  context.go('/subjects');
+                  context.go('/home');
                 }
               },
               child: const Text('Bỏ qua'),

@@ -18,6 +18,7 @@ import '../../features/subjects/presentation/subject_selection_page.dart';
 import '../../features/timetable/presentation/weekly_timetable_page.dart';
 import '../../features/weights/presentation/weight_configuration_page.dart';
 import '../../features/auth/providers/auth_provider.dart';
+import '../../models/user_profile.dart';
 import '../di/providers.dart';
 
 /// Router configuration with authentication guards
@@ -27,55 +28,70 @@ class AppRouter {
   AppRouter(this.ref);
 
   late final GoRouter router = GoRouter(
-    initialLocation: '/',
-    refreshListenable: GoRouterRefreshStream(
-      ref.watch(authStateProvider.future).asStream(),
-    ),
+    initialLocation: '/login',
+    // Remove refreshListenable to avoid auth provider interference
+    // refreshListenable: GoRouterRefreshStream(
+    //   ref.watch(authStateProvider.future).asStream(),
+    // ),
     redirect: (context, state) {
       final localStorage = ref.read(localStorageServiceProvider);
       final location = state.uri.path;
       
       // Check if storage is initialized
       if (!localStorage.isInitialized) {
-        print('[Router] Storage not initialized, allowing navigation to $location');
+        print('[Router] Storage not initialized, staying at $location');
         return null;
       }
 
-      // Check authentication from localStorage instead of provider
-      // because mock login only saves to localStorage
-      final userProfile = localStorage.getUserProfile();
-      final isAuthenticated = userProfile != null;
-      final hasCompletedOnboarding = localStorage.getSettings().hasCompletedOnboarding;
-
-      print('[Router] Location: $location, Auth: $isAuthenticated, Onboarding: $hasCompletedOnboarding');
-
-      // Public routes (no auth required)
-      final publicRoutes = ['/', '/login'];
+      // Check authentication from localStorage
+      UserProfile? userProfile;
+      bool isAuthenticated = false;
+      bool hasCompletedOnboarding = false;
       
-      // If not authenticated
+      try {
+        userProfile = localStorage.getUserProfile();
+        isAuthenticated = userProfile != null;
+        hasCompletedOnboarding = localStorage.getSettings().hasCompletedOnboarding;
+      } catch (e) {
+        print('[Router] Error reading storage: $e');
+        isAuthenticated = false;
+        hasCompletedOnboarding = false;
+      }
+
+      print('[Router] Location: $location, Auth: $isAuthenticated, Onboarding: $hasCompletedOnboarding, User: ${userProfile?.email ?? 'null'}');
+
+      // If not authenticated, only allow login and onboarding pages
       if (!isAuthenticated) {
-        // If trying to access protected route, redirect to login
-        if (!publicRoutes.contains(location)) {
+        if (location != '/login' && location != '/') {
           print('[Router] Not authenticated, redirecting to /login');
           return '/login';
         }
-        // Allow access to public routes
+        print('[Router] Not authenticated, staying at $location');
         return null;
       }
 
       // User is authenticated
+      print('[Router] User is authenticated: ${userProfile?.email}');
+      
       // If hasn't completed onboarding and not on onboarding page, redirect to onboarding
       if (!hasCompletedOnboarding && location != '/') {
         print('[Router] Onboarding not completed, redirecting to /');
         return '/';
       }
 
-      // If completed onboarding and on login/onboarding page, redirect to home
-      if (hasCompletedOnboarding && publicRoutes.contains(location)) {
+      // If authenticated and on login page, redirect to home
+      if (location == '/login') {
+        print('[Router] Already authenticated, redirecting to /home');
+        return '/home';
+      }
+
+      // If completed onboarding and on onboarding page, redirect to home
+      if (hasCompletedOnboarding && location == '/') {
         print('[Router] Authenticated and onboarded, redirecting to /home');
         return '/home';
       }
 
+      print('[Router] No redirect needed, staying at $location');
       return null; // No redirect needed
     },
     routes: [

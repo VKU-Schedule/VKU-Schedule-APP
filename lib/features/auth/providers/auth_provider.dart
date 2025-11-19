@@ -9,14 +9,11 @@ final authStateProvider = StreamProvider<UserProfile?>((ref) {
   return authService.authStateChanges;
 });
 
-/// Provider for current authenticated user
+/// Provider for current authenticated user (from local storage)
 final currentUserProvider = Provider<UserProfile?>((ref) {
-  final authState = ref.watch(authStateProvider);
-  return authState.when(
-    data: (user) => user,
-    loading: () => null,
-    error: (_, __) => null,
-  );
+  // Get user directly from local storage for immediate access
+  final localStorage = ref.watch(localStorageServiceProvider);
+  return localStorage.getUserProfile();
 });
 
 /// Provider to check if user is authenticated
@@ -28,8 +25,9 @@ final isAuthenticatedProvider = Provider<bool>((ref) {
 /// State notifier for auth operations with loading states
 class AuthNotifier extends StateNotifier<AsyncValue<UserProfile?>> {
   final AuthService _authService;
+  final Ref ref;
 
-  AuthNotifier(this._authService) : super(const AsyncValue.loading()) {
+  AuthNotifier(this._authService, this.ref) : super(const AsyncValue.loading()) {
     _initialize();
   }
 
@@ -49,6 +47,8 @@ class AuthNotifier extends StateNotifier<AsyncValue<UserProfile?>> {
     try {
       final user = await _authService.signInWithGoogle();
       state = AsyncValue.data(user);
+      // Invalidate currentUserProvider to refresh UI
+      ref.invalidate(currentUserProvider);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
     }
@@ -60,6 +60,8 @@ class AuthNotifier extends StateNotifier<AsyncValue<UserProfile?>> {
     try {
       await _authService.signOut();
       state = const AsyncValue.data(null);
+      // Invalidate currentUserProvider to refresh UI
+      ref.invalidate(currentUserProvider);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
     }
@@ -88,7 +90,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<UserProfile?>> {
 final authNotifierProvider =
     StateNotifierProvider<AuthNotifier, AsyncValue<UserProfile?>>((ref) {
   final authService = ref.watch(authServiceProvider);
-  return AuthNotifier(authService);
+  return AuthNotifier(authService, ref);
 });
 
 
