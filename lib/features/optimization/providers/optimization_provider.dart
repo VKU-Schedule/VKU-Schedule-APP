@@ -19,6 +19,11 @@ class OptimizationNotifier
     return [];
   }
 
+  void reset() {
+    print('[OptimizationNotifier] Resetting state to loading');
+    state = const AsyncValue.loading();
+  }
+
   Future<void> optimize({
     required List<Subject> selectedSubjects,
     required PreferenceConstraints constraints,

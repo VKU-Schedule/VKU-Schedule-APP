@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/widgets/app_bar.dart';
-import '../../../core/widgets/bottom_nav.dart';
 import '../../../core/widgets/weekly_grid.dart';
 import '../../../features/options/providers/chosen_option_provider.dart';
 import '../../../features/options/providers/saved_schedules_provider.dart';
@@ -327,8 +327,14 @@ class _WeeklyTimetablePageState extends ConsumerState<WeeklyTimetablePage> {
 
     if (chosenOption == null || chosenOption.sessions.isEmpty) {
       return Scaffold(
-        appBar: const VKUAppBar(
+        appBar: VKUAppBar(
           title: 'Lịch tuần',
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => context.go('/options'),
+            tooltip: 'Quay lại',
+            color: Colors.white,
+          ),
         ),
         body: Center(
           child: Column(
@@ -356,13 +362,20 @@ class _WeeklyTimetablePageState extends ConsumerState<WeeklyTimetablePage> {
             ],
           ),
         ),
-        bottomNavigationBar: const BottomNavBar(currentRoute: '/timetable'),
       );
     }
 
     return Scaffold(
       appBar: VKUAppBar(
         title: _isEditing ? 'Chỉnh sửa lịch' : 'Lịch tuần',
+        leading: _isEditing
+            ? null
+            : IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => context.go('/options'),
+                tooltip: 'Quay lại',
+                color: Colors.white,
+              ),
         actions: [
           if (_isEditing) ...[
             IconButton(
@@ -582,7 +595,6 @@ class _WeeklyTimetablePageState extends ConsumerState<WeeklyTimetablePage> {
             ),
         ],
       ),
-      bottomNavigationBar: const BottomNavBar(currentRoute: '/timetable'),
     );
   }
 

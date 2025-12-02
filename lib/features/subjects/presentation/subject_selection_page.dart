@@ -318,6 +318,7 @@ class _SubjectSelectionPageState extends ConsumerState<SubjectSelectionPage> {
                     _searchFocusNode.unfocus();
                   },
                   child: Container(
+                    constraints: const BoxConstraints(maxWidth: 200),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
                       vertical: 6,
@@ -333,18 +334,22 @@ class _SubjectSelectionPageState extends ConsumerState<SubjectSelectionPage> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.history,
                           size: 14,
                           color: AppTheme.vkuYellow800,
                         ),
                         const SizedBox(width: 4),
-                        Text(
-                          query,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppTheme.vkuYellow900,
-                            fontWeight: FontWeight.w500,
+                        Flexible(
+                          child: Text(
+                            query,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppTheme.vkuYellow900,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
                           ),
                         ),
                       ],
@@ -603,106 +608,117 @@ class _SubjectSelectionPageState extends ConsumerState<SubjectSelectionPage> {
 
   Widget _buildEmptySearchState() {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              gradient: AppTheme.gradientRedToYellow,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: AppTheme.vkuRed.withValues(alpha: 0.3),
-                  blurRadius: 20,
-                  offset: const Offset(0, 8),
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  gradient: AppTheme.gradientRedToYellow,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.vkuRed.withValues(alpha: 0.3),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: const Icon(
-              Icons.search,
-              size: 64,
-              color: Colors.white,
-            ),
+                child: const Icon(
+                  Icons.search,
+                  size: 64,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                'Tìm kiếm môn học',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.textDark,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Nhập tên môn học để bắt đầu tìm kiếm',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: AppTheme.textLight,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
-          const SizedBox(height: 24),
-          const Text(
-            'Tìm kiếm môn học',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppTheme.textDark,
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Nhập tên môn học để bắt đầu tìm kiếm',
-            style: TextStyle(
-              fontSize: 14,
-              color: AppTheme.textLight,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+        ),
       ),
     );
   }
 
   Widget _buildNoResultsState() {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          TweenAnimationBuilder<double>(
-            tween: Tween(begin: 0.0, end: 1.0),
-            duration: const Duration(milliseconds: 600),
-            curve: Curves.elasticOut,
-            builder: (context, value, child) {
-              return Transform.scale(
-                scale: value,
-                child: child,
-              );
-            },
-            child: Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: AppTheme.vkuYellow50,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: AppTheme.vkuYellow200,
-                  width: 2,
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0.0, end: 1.0),
+                duration: const Duration(milliseconds: 600),
+                curve: Curves.elasticOut,
+                builder: (context, value, child) {
+                  return Transform.scale(
+                    scale: value,
+                    child: child,
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: AppTheme.vkuYellow50,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppTheme.vkuYellow200,
+                      width: 2,
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.info_outline,
+                    size: 64,
+                    color: AppTheme.vkuYellow800,
+                  ),
                 ),
               ),
-              child: const Icon(
-                Icons.info_outline,
-                size: 64,
-                color: AppTheme.vkuYellow800,
+              const SizedBox(height: 24),
+              const Text(
+                'Không tìm thấy kết quả',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.textDark,
+                ),
               ),
-            ),
-          ),
-          const SizedBox(height: 24),
-          const Text(
-            'Không tìm thấy kết quả',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppTheme.textDark,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 48),
-            child: Text(
-              'Thử tìm kiếm với từ khóa khác hoặc điều chỉnh bộ lọc',
-              style: const TextStyle(
-                fontSize: 14,
-                color: AppTheme.textLight,
+              const SizedBox(height: 8),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24),
+                child: Text(
+                  'Thử tìm kiếm với từ khóa khác hoặc điều chỉnh bộ lọc',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: AppTheme.textLight,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               ),
-              textAlign: TextAlign.center,
-            ),
+            ],
           ),
-
-        ],
+        ),
       ),
     );
   }
@@ -730,7 +746,7 @@ class _SubjectSelectionPageState extends ConsumerState<SubjectSelectionPage> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [
+                colors: const [
                   AppTheme.backgroundGrey,
                   Colors.white,
                   AppTheme.backgroundGrey,
@@ -791,91 +807,97 @@ class _SubjectSelectionPageState extends ConsumerState<SubjectSelectionPage> {
 
   Widget _buildErrorState(String error) {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: AppTheme.errorLight,
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: AppTheme.error,
-                width: 2,
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: AppTheme.errorLight,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: AppTheme.error,
+                    width: 2,
+                  ),
+                ),
+                child: const Icon(
+                  Icons.error_outline,
+                  size: 64,
+                  color: AppTheme.error,
+                ),
               ),
-            ),
-            child: const Icon(
-              Icons.error_outline,
-              size: 64,
-              color: AppTheme.error,
-            ),
-          ),
-          const SizedBox(height: 24),
-          const Text(
-            'Đã xảy ra lỗi',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppTheme.textDark,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 48),
-            child: Text(
-              error,
-              style: const TextStyle(
-                fontSize: 14,
-                color: AppTheme.textLight,
+              const SizedBox(height: 24),
+              const Text(
+                'Đã xảy ra lỗi',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.textDark,
+                ),
               ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          const SizedBox(height: 24),
-          Container(
-            decoration: BoxDecoration(
-              gradient: AppTheme.gradientRedToYellow,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: AppTheme.subtleShadows,
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () {
-                  setState(() {
-                    // Trigger a refresh by clearing and resetting the query
-                    final currentQuery = _searchQuery;
-                    _searchQuery = '';
-                    Future.delayed(const Duration(milliseconds: 100), () {
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Text(
+                  error,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: AppTheme.textLight,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Container(
+                decoration: BoxDecoration(
+                  gradient: AppTheme.gradientRedToYellow,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: AppTheme.subtleShadows,
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
                       setState(() {
-                        _searchQuery = currentQuery;
+                        // Trigger a refresh by clearing and resetting the query
+                        final currentQuery = _searchQuery;
+                        _searchQuery = '';
+                        Future.delayed(const Duration(milliseconds: 100), () {
+                          setState(() {
+                            _searchQuery = currentQuery;
+                          });
+                        });
                       });
-                    });
-                  });
-                },
-                borderRadius: BorderRadius.circular(12),
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.refresh, color: Colors.white, size: 20),
-                      SizedBox(width: 8),
-                      Text(
-                        'Thử lại',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
+                    },
+                    borderRadius: BorderRadius.circular(12),
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.refresh, color: Colors.white, size: 20),
+                          SizedBox(width: 8),
+                          Text(
+                            'Thử lại',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

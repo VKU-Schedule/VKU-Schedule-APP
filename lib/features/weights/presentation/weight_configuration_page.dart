@@ -6,23 +6,69 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_bar.dart';
 import '../../../core/widgets/vku_components.dart';
+import '../../../core/widgets/vku_loading_animation.dart';
 import '../providers/weights_provider.dart';
 
-class WeightConfigurationPage extends ConsumerWidget {
+class WeightConfigurationPage extends ConsumerStatefulWidget {
   const WeightConfigurationPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<WeightConfigurationPage> createState() =>
+      _WeightConfigurationPageState();
+}
+
+class _WeightConfigurationPageState
+    extends ConsumerState<WeightConfigurationPage>
+    with SingleTickerProviderStateMixin {
+  bool _isLoading = true;
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+    
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
+    );
+    
+    // Simulate loading weights data
+    Future.delayed(const Duration(milliseconds: 800), () {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        _animationController.forward();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final weights = ref.watch(weightsProvider);
 
     return Scaffold(
       appBar: const VKUAppBar(
         title: 'Cấu hình trọng số',
       ),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(AppTheme.spaceLg),
-          children: [
+      body: 
+          SafeArea(
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: ListView(
+                  padding: const EdgeInsets.all(AppTheme.spaceLg),
+                  children: [
             Text(
               'Điều chỉnh trọng số cho các tiêu chí',
               style: Theme.of(context).textTheme.headlineMedium,
@@ -131,26 +177,26 @@ class WeightConfigurationPage extends ConsumerWidget {
               },
             ),
             const SizedBox(height: AppTheme.spaceXl),
-            VKUButton(
-              text: 'Lưu và tiếp tục',
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Đã lưu cấu hình trọng số'),
-                    backgroundColor: AppTheme.success,
-                  ),
-                );
-                context.go('/optimize');
-              },
-              fullWidth: true,
-              useGradient: true,
-              variant: VKUButtonVariant.primary,
-              size: VKUButtonSize.large,
-              icon: Icons.arrow_forward,
+                    VKUButton(
+                      text: 'Lưu và tiếp tục',
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Đã lưu cấu hình trọng số'),
+                            backgroundColor: AppTheme.success,
+                          ),
+                        );
+                        context.go('/optimize');
+                      },
+                      fullWidth: true,
+                      useGradient: true,
+                      size: VKUButtonSize.large,
+                      icon: Icons.arrow_forward,
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ],
-        ),
-      ),
     );
   }
 

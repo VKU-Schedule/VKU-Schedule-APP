@@ -29,11 +29,16 @@ class ApiSession {
 
   factory ApiSession.fromJson(Map<String, dynamic> json) {
     // Helper function to safely convert num (int or double) to int
-    int _toInt(dynamic value) {
+    int _toInt(dynamic value, {int defaultValue = 0}) {
+      if (value == null || value == '') return defaultValue;
       if (value is int) return value;
       if (value is double) return value.toInt();
       if (value is num) return value.toInt();
-      throw FormatException('Cannot convert $value to int');
+      if (value is String) {
+        final parsed = int.tryParse(value);
+        if (parsed != null) return parsed;
+      }
+      return defaultValue;
     }
 
     return ApiSession(
@@ -41,12 +46,12 @@ class ApiSession {
       teacher: json['teacher'] as String,
       day: json['day'] as String,
       periods: (json['periods'] as List<dynamic>)
-          .map((p) => _toInt(p))
+          .map((p) => _toInt(p, defaultValue: 1))
           .toList(),
       room: json['room'] as String,
       area: json['area'] as String,
-      classIndex: _toInt(json['class_index'] ?? json['classIndex']),
-      classSize: _toInt(json['class_size'] ?? json['classSize']),
+      classIndex: _toInt(json['class_index'] ?? json['classIndex'], defaultValue: 1),
+      classSize: _toInt(json['class_size'] ?? json['classSize'], defaultValue: 0),
       language: json['language'] as String,
       field: json['field'] as String,
       subTopic: json['sub_topic'] as String? ?? json['subTopic'] as String? ?? '',
