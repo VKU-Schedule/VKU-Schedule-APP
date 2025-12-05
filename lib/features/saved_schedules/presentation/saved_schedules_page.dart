@@ -48,20 +48,20 @@ class SavedSchedulesPage extends ConsumerWidget {
                   Icon(
                     Icons.bookmark_border,
                     size: 64,
-                    color: Colors.grey[400],
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     'Chưa có lịch đã lưu',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: Colors.grey[600],
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                         ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Lưu các phương án bạn muốn xem sau',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.grey[500],
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                         ),
                   ),
                 ],
@@ -229,6 +229,7 @@ class _SessionGroup extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final dateFormat = DateFormat('dd/MM/yyyy HH:mm');
     final createdAt = schedules.first.savedAt;
     
@@ -257,9 +258,9 @@ class _SessionGroup extends ConsumerWidget {
                     ),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.folder_special,
-                    color: Colors.white,
+                    color: isDark ? const Color(0xFF0A0A0A) : Colors.white,
                     size: 24,
                   ),
                 ),
@@ -280,13 +281,13 @@ class _SessionGroup extends ConsumerWidget {
                           Icon(
                             Icons.access_time,
                             size: 14,
-                            color: Colors.grey[600],
+                            color: theme.colorScheme.onSurface.withOpacity(0.6),
                           ),
                           const SizedBox(width: 4),
                           Text(
                             dateFormat.format(createdAt),
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: Colors.grey[600],
+                              color: theme.colorScheme.onSurface.withOpacity(0.6),
                             ),
                           ),
                         ],
@@ -300,7 +301,9 @@ class _SessionGroup extends ConsumerWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                    color: isDark 
+                        ? theme.colorScheme.primary.withValues(alpha: 0.25)
+                        : theme.colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -316,7 +319,7 @@ class _SessionGroup extends ConsumerWidget {
                 // Button xóa cả nhóm
                 IconButton(
                   icon: const Icon(Icons.delete_outline),
-                  color: Colors.red,
+                  color: isDark ? const Color(0xFFFF6B6B) : Colors.red,
                   tooltip: 'Xóa tất cả',
                   onPressed: () => _deleteAllSchedules(context, ref),
                 ),
@@ -474,6 +477,7 @@ class _SavedScheduleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final dateFormat = DateFormat('dd/MM/yyyy HH:mm');
     final savedAtText = dateFormat.format(saved.savedAt);
 
@@ -500,7 +504,9 @@ class _SavedScheduleCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                    color: isDark
+                        ? theme.colorScheme.primary.withValues(alpha: 0.25)
+                        : theme.colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
@@ -526,13 +532,13 @@ class _SavedScheduleCard extends StatelessWidget {
                           Icon(
                             Icons.access_time,
                             size: 14,
-                            color: Colors.grey[600],
+                            color: theme.colorScheme.onSurface.withOpacity(0.6),
                           ),
                           const SizedBox(width: 4),
                           Text(
                             savedAtText,
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: Colors.grey[600],
+                              color: theme.colorScheme.onSurface.withOpacity(0.6),
                             ),
                           ),
                         ],
@@ -547,22 +553,24 @@ class _SavedScheduleCard extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.green[100],
+                      color: isDark 
+                          ? const Color(0xFF4CAF50).withOpacity(0.3)
+                          : const Color(0xFFC8E6C9),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
                           Icons.check_circle,
-                          color: Colors.green,
+                          color: isDark ? const Color(0xFF4CAF50) : const Color(0xFF2E7D32),
                           size: 14,
                         ),
-                        SizedBox(width: 4),
+                        const SizedBox(width: 4),
                         Text(
                           'Đang dùng',
                           style: TextStyle(
-                            color: Colors.green,
+                            color: isDark ? const Color(0xFF4CAF50) : const Color(0xFF2E7D32),
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
                           ),
@@ -582,14 +590,16 @@ class _SavedScheduleCard extends StatelessWidget {
                     context,
                     Icons.event,
                     '$sessionCount buổi',
-                    Colors.blue,
+                    isDark ? const Color(0xFF64B5F6) : Colors.blue,
+                    isDark,
                   ),
                   const SizedBox(width: 8),
                   _buildInfoChip(
                     context,
                     Icons.star,
                     'Điểm: ${score.toStringAsFixed(1)}',
-                    Colors.orange,
+                    isDark ? const Color(0xFFFFB74D) : Colors.orange,
+                    isDark,
                   ),
                 ],
               ),
@@ -615,8 +625,10 @@ class _SavedScheduleCard extends StatelessWidget {
                     label: const Text('Xóa'),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      foregroundColor: Colors.red,
-                      side: const BorderSide(color: Colors.red),
+                      foregroundColor: isDark ? const Color(0xFFFF6B6B) : Colors.red,
+                      side: BorderSide(
+                        color: isDark ? const Color(0xFFFF6B6B) : Colors.red,
+                      ),
                     ),
                   ),
                 ),
@@ -633,11 +645,14 @@ class _SavedScheduleCard extends StatelessWidget {
     IconData icon,
     String text,
     Color color,
+    bool isDark,
   ) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
+        color: isDark 
+            ? color.withValues(alpha: 0.25)
+            : color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(

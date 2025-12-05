@@ -25,12 +25,17 @@ class OptionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final summary = option.getSummary();
 
     return Card(
       elevation: isChosen ? 4 : 2,
       margin: const EdgeInsets.only(bottom: 16),
-      color: isChosen ? theme.colorScheme.primaryContainer.withOpacity(0.3) : null,
+      color: isChosen 
+          ? (isDark 
+              ? theme.colorScheme.primary.withOpacity(0.15)
+              : theme.colorScheme.primaryContainer.withOpacity(0.3))
+          : null,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: isChosen
@@ -57,7 +62,7 @@ class OptionCard extends StatelessWidget {
                       end: Alignment.bottomRight,
                     ),
                     borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
+                    boxShadow: isDark ? [] : [
                       BoxShadow(
                         color: theme.colorScheme.primary.withOpacity(0.3),
                         blurRadius: 8,
@@ -68,9 +73,9 @@ class OptionCard extends StatelessWidget {
                   child: Center(
                     child: Text(
                       '#$index',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: isDark ? const Color(0xFF0A0A0A) : Colors.white,
                         fontSize: 18,
                       ),
                     ),
@@ -90,22 +95,24 @@ class OptionCard extends StatelessWidget {
                                 vertical: 4,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.green,
+                                color: isDark 
+                                    ? const Color(0xFF4CAF50)
+                                    : Colors.green,
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Icon(
                                     Icons.check_circle,
-                                    color: Colors.white,
+                                    color: isDark ? const Color(0xFF0A0A0A) : Colors.white,
                                     size: 16,
                                   ),
-                                  SizedBox(width: 4),
+                                  const SizedBox(width: 4),
                                   Text(
                                     'Đã chọn',
                                     style: TextStyle(
-                                      color: Colors.white,
+                                      color: isDark ? const Color(0xFF0A0A0A) : Colors.white,
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -124,7 +131,9 @@ class OptionCard extends StatelessWidget {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.secondary.withOpacity(0.15),
+                              color: isDark
+                                  ? theme.colorScheme.secondary.withOpacity(0.25)
+                                  : theme.colorScheme.secondary.withOpacity(0.15),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Row(
@@ -179,29 +188,33 @@ class OptionCard extends StatelessWidget {
                   'Xung đột',
                   '${option.metrics.conflicts}',
                   option.metrics.conflicts == 0
-                      ? Colors.green
-                      : Colors.orange,
+                      ? (isDark ? const Color(0xFF4CAF50) : Colors.green)
+                      : (isDark ? const Color(0xFFFFB74D) : Colors.orange),
+                  isDark,
                 ),
                 _buildMetricChip(
                   context,
                   Icons.wb_sunny,
                   'Buổi sáng',
                   '${(option.metrics.morningRatio * 100).toStringAsFixed(0)}%',
-                  Colors.blue,
+                  isDark ? const Color(0xFF64B5F6) : Colors.blue,
+                  isDark,
                 ),
                 _buildMetricChip(
                   context,
                   Icons.balance,
                   'Cân bằng',
                   '${(option.metrics.balance * 100).toStringAsFixed(0)}%',
-                  Colors.purple,
+                  isDark ? const Color(0xFFBA68C8) : Colors.purple,
+                  isDark,
                 ),
                 _buildMetricChip(
                   context,
                   Icons.timer_outlined,
                   'Khoảng cách',
                   '${(option.metrics.gapScore * 100).toStringAsFixed(0)}%',
-                  Colors.teal,
+                  isDark ? const Color(0xFF4DB6AC) : Colors.teal,
+                  isDark,
                 ),
               ],
             ),
@@ -253,9 +266,11 @@ class OptionCard extends StatelessWidget {
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: isSaved
-                          ? Colors.grey[400]
-                          : Theme.of(context).colorScheme.primary,
-                      foregroundColor: Colors.white,
+                          ? (isDark ? const Color(0xFF424242) : Colors.grey[400])
+                          : theme.colorScheme.primary,
+                      foregroundColor: isSaved
+                          ? (isDark ? const Color(0xFF9E9E9E) : Colors.white)
+                          : (isDark ? const Color(0xFF0A0A0A) : Colors.white),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       elevation: isSaved ? 0 : 2,
                     ),
@@ -275,13 +290,21 @@ class OptionCard extends StatelessWidget {
     String label,
     String value,
     Color color,
+    bool isDark,
   ) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: isDark 
+            ? color.withOpacity(0.2)
+            : color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3), width: 1.5),
+        border: Border.all(
+          color: isDark 
+              ? color.withOpacity(0.5)
+              : color.withOpacity(0.3), 
+          width: 1.5,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -292,7 +315,7 @@ class OptionCard extends StatelessWidget {
             label,
             style: TextStyle(
               fontSize: 11,
-              color: color.withOpacity(0.9),
+              color: isDark ? color.withOpacity(0.95) : color.withOpacity(0.9),
               fontWeight: FontWeight.w600,
             ),
           ),

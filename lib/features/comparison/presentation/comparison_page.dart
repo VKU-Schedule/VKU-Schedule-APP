@@ -61,7 +61,15 @@ class _ComparisonPageState extends ConsumerState<ComparisonPage> {
             children: [
               Container(
                 padding: const EdgeInsets.all(16),
-                color: Colors.grey[100],
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  border: Border(
+                    bottom: BorderSide(
+                      color: Theme.of(context).dividerColor,
+                      width: 1,
+                    ),
+                  ),
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -99,17 +107,17 @@ class _ComparisonPageState extends ConsumerState<ComparisonPage> {
               ),
               Expanded(
                 child: _selectedOptionIds.length < 2
-                    ? const Center(
+                    ? Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
                               Icons.compare_arrows,
                               size: 64,
-                              color: Colors.grey,
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                             ),
-                            SizedBox(height: 16),
-                            Text(
+                            const SizedBox(height: 16),
+                            const Text(
                               'Chọn ít nhất 2 phương án để so sánh',
                             ),
                           ],
