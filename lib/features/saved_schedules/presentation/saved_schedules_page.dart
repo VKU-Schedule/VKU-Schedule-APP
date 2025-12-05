@@ -10,6 +10,7 @@ import '../../../models/schedule_option.dart';
 import '../../options/providers/saved_schedules_provider.dart';
 import '../../options/providers/chosen_option_provider.dart';
 import '../../comparison/presentation/comparison_page.dart';
+import '../../export/presentation/export_calendar_dialog.dart';
 
 class SavedSchedulesPage extends ConsumerWidget {
   const SavedSchedulesPage({super.key});
@@ -605,6 +606,7 @@ class _SavedScheduleCard extends StatelessWidget {
               ),
             ],
             const SizedBox(height: 16),
+            // First row of buttons
             Row(
               children: [
                 Expanded(
@@ -619,20 +621,42 @@ class _SavedScheduleCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: onDelete,
-                    icon: const Icon(Icons.delete_outline, size: 18),
-                    label: const Text('Xóa'),
-                    style: OutlinedButton.styleFrom(
+                  child: ElevatedButton.icon(
+                    onPressed: scheduleOption != null
+                        ? () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => ExportCalendarDialog(
+                                schedule: scheduleOption,
+                              ),
+                            );
+                          }
+                        : null,
+                    icon: const Icon(Icons.upload, size: 18),
+                    label: const Text('Xuất GG'),
+                    style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      foregroundColor: isDark ? const Color(0xFFFF6B6B) : Colors.red,
-                      side: BorderSide(
-                        color: isDark ? const Color(0xFFFF6B6B) : Colors.red,
-                      ),
                     ),
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 8),
+            // Second row - Delete button
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: onDelete,
+                icon: const Icon(Icons.delete_outline, size: 18),
+                label: const Text('Xóa lịch'),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  foregroundColor: isDark ? const Color(0xFFFF6B6B) : Colors.red,
+                  side: BorderSide(
+                    color: isDark ? const Color(0xFFFF6B6B) : Colors.red,
+                  ),
+                ),
+              ),
             ),
           ],
         ),

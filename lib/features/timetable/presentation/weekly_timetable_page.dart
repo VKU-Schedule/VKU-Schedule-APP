@@ -10,6 +10,7 @@ import '../../../features/options/providers/saved_schedules_provider.dart';
 import '../../../models/session.dart';
 import '../../../models/schedule_option.dart';
 import '../../../services/timetable_export_service.dart';
+import '../../export/presentation/export_calendar_dialog.dart';
 import 'add_session_page.dart';
 import 'session_details_sheet.dart';
 
@@ -145,6 +146,8 @@ class _WeeklyTimetablePageState extends ConsumerState<WeeklyTimetablePage> {
   }
 
   void _showExportMenu() {
+    final chosenOption = ref.read(chosenOptionProvider);
+    
     showModalBottomSheet(
       context: context,
       builder: (context) => Container(
@@ -160,6 +163,26 @@ class _WeeklyTimetablePageState extends ConsumerState<WeeklyTimetablePage> {
               ),
             ),
             const SizedBox(height: 20),
+            ListTile(
+              leading: Icon(
+                Icons.calendar_today,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              title: const Text('Xuất Google Calendar'),
+              subtitle: const Text('Đồng bộ lịch học lên Google Calendar'),
+              onTap: () {
+                Navigator.pop(context);
+                if (chosenOption != null) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => ExportCalendarDialog(
+                      schedule: chosenOption,
+                    ),
+                  );
+                }
+              },
+            ),
+            const Divider(),
             ListTile(
               leading: const Icon(Icons.share),
               title: const Text('Chia sẻ dạng text'),
