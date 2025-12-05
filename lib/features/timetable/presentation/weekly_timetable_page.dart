@@ -331,7 +331,7 @@ class _WeeklyTimetablePageState extends ConsumerState<WeeklyTimetablePage> {
           title: 'Lịch tuần',
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
-            onPressed: () => context.go('/options'),
+            onPressed: () => context.pop(),
             tooltip: 'Quay lại',
             color: Colors.white,
           ),
@@ -372,7 +372,7 @@ class _WeeklyTimetablePageState extends ConsumerState<WeeklyTimetablePage> {
             ? null
             : IconButton(
                 icon: const Icon(Icons.arrow_back),
-                onPressed: () => context.go('/options'),
+                onPressed: () => context.pop(),
                 tooltip: 'Quay lại',
                 color: Colors.white,
               ),

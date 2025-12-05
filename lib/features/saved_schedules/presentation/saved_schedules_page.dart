@@ -97,7 +97,7 @@ class SavedSchedulesPage extends ConsumerWidget {
                       ref
                           .read(chosenOptionProvider.notifier)
                           .selectOption(scheduleOption);
-                      context.go('/timetable');
+                      context.push('/timetable');
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
@@ -387,7 +387,7 @@ class _SessionGroup extends ConsumerWidget {
                       ref
                           .read(chosenOptionProvider.notifier)
                           .selectOption(scheduleOption);
-                      context.go('/timetable');
+                      context.push('/timetable');
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(

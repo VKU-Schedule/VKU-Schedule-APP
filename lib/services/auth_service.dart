@@ -66,6 +66,9 @@ class AuthService {
   /// Sign in with Google
   Future<UserProfile?> signInWithGoogle() async {
     try {
+      // Sign out first to force account selection
+      await _googleSignIn.signOut();
+      
       // Trigger Google Sign-In flow
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 

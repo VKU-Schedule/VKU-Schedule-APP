@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/di/providers.dart';
 import '../providers/auth_provider.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -29,7 +30,26 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         },
       );
 
+      // Wait a bit for state to update
+      await Future.delayed(const Duration(milliseconds: 100));
+
       if (mounted) {
+        // Check if sign-in was actually successful by checking auth state
+        final authState = ref.read(authNotifierProvider);
+        
+        if (authState.hasError) {
+          // Sign-in failed
+          throw authState.error!;
+        }
+        
+        // Verify user is actually authenticated
+        final localStorage = ref.read(localStorageServiceProvider);
+        final userProfile = localStorage.getUserProfile();
+        
+        if (userProfile == null) {
+          throw Exception('Đăng nhập thất bại: Không thể lưu thông tin người dùng');
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Đăng nhập Google thành công!'),
@@ -37,7 +57,15 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           ),
         );
         
-        context.go('/');
+        // Check if user has completed onboarding
+        final hasCompletedOnboarding = localStorage.getSettings().hasCompletedOnboarding;
+        
+        // Navigate based on onboarding status
+        if (hasCompletedOnboarding) {
+          context.go('/home');
+        } else {
+          context.go('/');
+        }
       }
     } on TimeoutException catch (e) {
       if (mounted) {
