@@ -3,26 +3,21 @@ import 'package:vku_schedule/models/user_profile.dart';
 import 'package:vku_schedule/services/auth_service.dart';
 import 'package:vku_schedule/core/di/providers.dart';
 
-/// Stream provider for authentication state changes
 final authStateProvider = StreamProvider<UserProfile?>((ref) {
   final authService = ref.watch(authServiceProvider);
   return authService.authStateChanges;
 });
 
-/// Provider for current authenticated user (from local storage)
 final currentUserProvider = Provider<UserProfile?>((ref) {
-  // Get user directly from local storage for immediate access
   final localStorage = ref.watch(localStorageServiceProvider);
   return localStorage.getUserProfile();
 });
 
-/// Provider to check if user is authenticated
 final isAuthenticatedProvider = Provider<bool>((ref) {
   final user = ref.watch(currentUserProvider);
   return user != null;
 });
 
-/// State notifier for auth operations with loading states
 class AuthNotifier extends StateNotifier<AsyncValue<UserProfile?>> {
   final AuthService _authService;
   final Ref ref;
@@ -31,7 +26,6 @@ class AuthNotifier extends StateNotifier<AsyncValue<UserProfile?>> {
     _initialize();
   }
 
-  /// Initialize by attempting silent sign-in
   Future<void> _initialize() async {
     try {
       final user = await _authService.signInSilently();
@@ -86,7 +80,6 @@ class AuthNotifier extends StateNotifier<AsyncValue<UserProfile?>> {
   }
 }
 
-/// Provider for auth operations
 final authNotifierProvider =
     StateNotifierProvider<AuthNotifier, AsyncValue<UserProfile?>>((ref) {
   final authService = ref.watch(authServiceProvider);

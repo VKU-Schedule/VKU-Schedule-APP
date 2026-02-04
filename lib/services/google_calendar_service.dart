@@ -98,15 +98,11 @@ class GoogleCalendarService {
     DateTime semesterStart,
     DateTime semesterEnd,
   ) async {
-    // Get the first occurrence date
     final firstOccurrence = _getFirstOccurrence(session, semesterStart);
     
-    // Get time range for the session
     final startTime = _getPeriodStartTime(session.startPeriod);
     final endTime = _getPeriodEndTime(session.endPeriod);
 
-    // Create DateTime in UTC, then adjust for Vietnam timezone (UTC+7)
-    // Google Calendar API expects UTC time when timezone is specified
     final dateStr = '${firstOccurrence.year.toString().padLeft(4, '0')}-'
         '${firstOccurrence.month.toString().padLeft(2, '0')}-'
         '${firstOccurrence.day.toString().padLeft(2, '0')}';
@@ -117,21 +113,14 @@ class GoogleCalendarService {
     final endTimeStr = 'T${endTime.hour.toString().padLeft(2, '0')}:'
         '${endTime.minute.toString().padLeft(2, '0')}:00';
 
-    // Create DateTime in local time, then convert to UTC
-    // This is the key: we need to subtract 7 hours to get UTC time
-    // because Vietnam is UTC+7
     final localStart = DateTime.parse('$dateStr$startTimeStr');
     final localEnd = DateTime.parse('$dateStr$endTimeStr');
     
-    // Convert to UTC by subtracting 7 hours
     final eventStart = localStart.subtract(const Duration(hours: 7));
     final eventEnd = localEnd.subtract(const Duration(hours: 7));
 
-    // Create recurrence rule (weekly until semester end)
     final rrule = 'RRULE:FREQ=WEEKLY;UNTIL=${_formatDateForRRule(semesterEnd)}';
 
-    // Create EventDateTime objects with UTC time
-    // When we set timezone, Google Calendar will display it in that timezone
     final startEventDateTime = calendar.EventDateTime();
     startEventDateTime.dateTime = eventStart;
     startEventDateTime.timeZone = 'Asia/Ho_Chi_Minh';
@@ -171,7 +160,6 @@ Chuyên ngành: ${session.field}
     await calendarApi.events.insert(event, calendarId);
   }
 
-  /// Get the first occurrence of a session based on day of week
   DateTime _getFirstOccurrence(Session session, DateTime semesterStart) {
     final targetDayIndex = session.dayIndex; // 0 = Monday, 6 = Sunday
     final startDayIndex = semesterStart.weekday - 1; // Convert to 0-based
@@ -219,25 +207,21 @@ Chuyên ngành: ${session.field}
     return periodTimes[period] ?? const TimeOfDay(hour: 8, minute: 20);
   }
 
-  /// Format date for RRULE (YYYYMMDDTHHMMSSZ)
   String _formatDateForRRule(DateTime date) {
     final utc = date.toUtc();
     return '${utc.year}${utc.month.toString().padLeft(2, '0')}${utc.day.toString().padLeft(2, '0')}T235959Z';
   }
 
-  /// Get color ID for a subject (Google Calendar colors 1-11)
   String _getColorForSubject(String courseName) {
     final hash = courseName.hashCode.abs();
     final colorId = (hash % 11) + 1; // Colors 1-11
     return colorId.toString();
   }
 
-  /// Sign out from Google
   Future<void> signOut() async {
     await _googleSignIn.signOut();
   }
 
-  /// Check if user is signed in
   Future<bool> isSignedIn() async {
     return await _googleSignIn.isSignedIn();
   }

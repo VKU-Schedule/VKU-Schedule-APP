@@ -27,27 +27,21 @@ class AuthService {
                 'https://www.googleapis.com/auth/calendar',
               ],
             ) {
-    // Initialize stream controller with onListen callback
     _authStateController = StreamController<UserProfile?>.broadcast(
       onListen: () {
-        // Emit current user when stream is first listened to
         if (_currentUser != null) {
           _authStateController.add(_currentUser);
         }
       },
     );
     
-    // Load user from local storage on initialization
     _loadUserFromStorage();
   }
 
-  /// Stream of authentication state changes
   Stream<UserProfile?> get authStateChanges => _authStateController.stream;
 
-  /// Get current authenticated user
   UserProfile? get currentUser => _currentUser;
 
-  /// Check if user is authenticated
   bool get isAuthenticated => _currentUser != null;
 
   /// Load user from local storage
@@ -59,17 +53,14 @@ class AuthService {
         _authStateController.add(user);
       }
     } catch (e) {
-      // Ignore errors during initialization
     }
   }
 
   /// Sign in with Google
   Future<UserProfile?> signInWithGoogle() async {
     try {
-      // Sign out first to force account selection
       await _googleSignIn.signOut();
       
-      // Trigger Google Sign-In flow
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
       if (googleUser == null) {
@@ -102,13 +93,10 @@ class AuthService {
         photoUrl: googleUser.photoUrl,
       );
 
-      // Save user profile to local storage
       await _localStorage.saveUserProfile(userProfile);
 
-      // Store auth tokens securely
       await _storeAuthTokens(accessToken, idToken);
 
-      // Update current user and notify listeners
       _currentUser = userProfile;
       _authStateController.add(userProfile);
 

@@ -50,7 +50,6 @@ class _HomePageState extends ConsumerState<HomePage>
         slivers: [
           
 
-          // Hero Section with VKU Branding
           SliverToBoxAdapter(
             child: HeroSection(
               animationController: _animationController,
@@ -58,7 +57,6 @@ class _HomePageState extends ConsumerState<HomePage>
             ),
           ),
 
-          // Stats Cards with Glassmorphism
           SliverToBoxAdapter(
             child: StatsCards(
               enrolledSubjectsCount: subjectSelection.enrolledSubjects.length,
@@ -66,12 +64,10 @@ class _HomePageState extends ConsumerState<HomePage>
             ),
           ),
 
-          // Quick Actions Section
           const SliverToBoxAdapter(
             child: QuickActionsSection(),
           ),
 
-          // Bottom padding
           const SliverToBoxAdapter(
             child: SizedBox(height: 100),
           ),

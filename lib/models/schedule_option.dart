@@ -49,10 +49,8 @@ class ScheduleOption {
         .map((apiSession) => Session.fromApiSession(apiSession))
         .toList();
 
-    // Calculate metrics from sessions
     final metrics = calculateMetrics(sessions);
 
-    // Generate unique, short, user-friendly ID from sessions content
     final uniqueId = _generateUniqueId(sessions);
 
     return ScheduleOption(
@@ -69,8 +67,6 @@ class ScheduleOption {
     if (sessions.isEmpty) {
       return ScheduleMetrics();
     }
-
-    // Calculate conflicts (overlapping sessions)
     int conflicts = 0;
     for (int i = 0; i < sessions.length; i++) {
       for (int j = i + 1; j < sessions.length; j++) {
@@ -80,7 +76,6 @@ class ScheduleOption {
       }
     }
 
-    // Calculate morning ratio (sessions before period 6)
     final morningSessions = sessions.where((s) => s.startPeriod < 6).length;
     final morningRatio = morningSessions / sessions.length;
 
@@ -124,9 +119,6 @@ class ScheduleOption {
     );
   }
 
-  /// Generate unique, short, user-friendly ID from sessions content
-  /// Format: PA + 6 characters (base36: 0-9, a-z)
-  /// This ensures uniqueness based on schedule content and prevents collisions
   static String _generateUniqueId(List<Session> sessions) {
     // Create hash from sessions content to ensure uniqueness
     int contentHash = sessions.fold<int>(
@@ -134,23 +126,18 @@ class ScheduleOption {
       (prev, session) => prev ^ session.hashCode,
     );
     
-    // Add timestamp to ensure uniqueness even with identical sessions
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     final combinedHash = contentHash ^ timestamp.hashCode;
     
-    // Convert to base36 (0-9, a-z) for shorter, readable format
     final base36Id = _toBase36(combinedHash.abs(), length: 6);
     
     return 'PA$base36Id';
   }
 
-  /// Generate a unique ID based on sessions content (fallback for fromJson)
   static String _generateIdFromSessions(List<Session> sessions) {
     return _generateUniqueId(sessions);
   }
 
-  /// Convert integer to base36 string (0-9, a-z)
-  /// Ensures output has exactly [length] characters (padded with 0)
   static String _toBase36(int value, {required int length}) {
     const chars = '0123456789abcdefghijklmnopqrstuvwxyz';
     if (value == 0) {
@@ -160,13 +147,11 @@ class ScheduleOption {
     final buffer = StringBuffer();
     int remaining = value;
     
-    // Convert to base36
     while (remaining > 0) {
       buffer.write(chars[remaining % 36]);
       remaining ~/= 36;
     }
     
-    // Reverse and ensure exactly [length] characters
     final result = buffer.toString().split('').reversed.join();
     
     // If longer than desired length, take last [length] characters
