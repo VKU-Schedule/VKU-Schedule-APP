@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/di/providers.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'features/settings/providers/settings_provider.dart';
 import 'services/local_storage_service.dart';
 
 void main() async {
@@ -30,11 +31,29 @@ class VKUScheduleApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = AppRouter(ref).router;
+    final settings = ref.watch(settingsProvider);
+    
+    // Determine theme mode
+    ThemeMode themeMode;
+    switch (settings.themeMode) {
+      case 'light':
+        themeMode = ThemeMode.light;
+        break;
+      case 'dark':
+        themeMode = ThemeMode.dark;
+        break;
+      case 'system':
+      default:
+        themeMode = ThemeMode.system;
+        break;
+    }
     
     return MaterialApp.router(
       title: 'VKU Schedule',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeMode,
       routerConfig: router,
     );
   }

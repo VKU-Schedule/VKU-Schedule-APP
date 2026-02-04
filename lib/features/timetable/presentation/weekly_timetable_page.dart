@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/widgets/app_bar.dart';
-import '../../../core/widgets/bottom_nav.dart';
 import '../../../core/widgets/weekly_grid.dart';
 import '../../../features/options/providers/chosen_option_provider.dart';
 import '../../../features/options/providers/saved_schedules_provider.dart';
 import '../../../models/session.dart';
 import '../../../models/schedule_option.dart';
 import '../../../services/timetable_export_service.dart';
+import '../../export/presentation/export_calendar_dialog.dart';
 import 'add_session_page.dart';
 import 'session_details_sheet.dart';
 
@@ -145,6 +146,8 @@ class _WeeklyTimetablePageState extends ConsumerState<WeeklyTimetablePage> {
   }
 
   void _showExportMenu() {
+    final chosenOption = ref.read(chosenOptionProvider);
+    
     showModalBottomSheet(
       context: context,
       builder: (context) => Container(
@@ -160,6 +163,26 @@ class _WeeklyTimetablePageState extends ConsumerState<WeeklyTimetablePage> {
               ),
             ),
             const SizedBox(height: 20),
+            ListTile(
+              leading: Icon(
+                Icons.calendar_today,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              title: const Text('Xuất Google Calendar'),
+              subtitle: const Text('Đồng bộ lịch học lên Google Calendar'),
+              onTap: () {
+                Navigator.pop(context);
+                if (chosenOption != null) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => ExportCalendarDialog(
+                      schedule: chosenOption,
+                    ),
+                  );
+                }
+              },
+            ),
+            const Divider(),
             ListTile(
               leading: const Icon(Icons.share),
               title: const Text('Chia sẻ dạng text'),
@@ -327,8 +350,14 @@ class _WeeklyTimetablePageState extends ConsumerState<WeeklyTimetablePage> {
 
     if (chosenOption == null || chosenOption.sessions.isEmpty) {
       return Scaffold(
-        appBar: const VKUAppBar(
+        appBar: VKUAppBar(
           title: 'Lịch tuần',
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => context.pop(),
+            tooltip: 'Quay lại',
+            color: Colors.white,
+          ),
         ),
         body: Center(
           child: Column(
@@ -356,13 +385,20 @@ class _WeeklyTimetablePageState extends ConsumerState<WeeklyTimetablePage> {
             ],
           ),
         ),
-        bottomNavigationBar: const BottomNavBar(currentRoute: '/timetable'),
       );
     }
 
     return Scaffold(
       appBar: VKUAppBar(
         title: _isEditing ? 'Chỉnh sửa lịch' : 'Lịch tuần',
+        leading: _isEditing
+            ? null
+            : IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => context.pop(),
+                tooltip: 'Quay lại',
+                color: Colors.white,
+              ),
         actions: [
           if (_isEditing) ...[
             IconButton(
@@ -582,7 +618,6 @@ class _WeeklyTimetablePageState extends ConsumerState<WeeklyTimetablePage> {
             ),
         ],
       ),
-      bottomNavigationBar: const BottomNavBar(currentRoute: '/timetable'),
     );
   }
 

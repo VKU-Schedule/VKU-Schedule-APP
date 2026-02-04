@@ -155,6 +155,23 @@ class AppTheme {
   static const double elevationMd = 4.0;
   static const double elevationLg = 8.0;
 
+  // ============================================================================
+  // Dark Theme Colors
+  // ============================================================================
+  
+  static const Color darkBackground = Color(0xFF0A0A0A);
+  static const Color darkSurface = Color(0xFF1A1A1A);
+  static const Color darkSurfaceVariant = Color(0xFF252525);
+  static const Color darkCard = Color(0xFF1E1E1E);
+  static const Color darkTextPrimary = Color(0xFFE8E8E8);
+  static const Color darkTextSecondary = Color(0xFF9E9E9E);
+  static const Color darkDivider = Color(0xFF2F2F2F);
+  
+  // Dark theme VKU colors - softer versions
+  static const Color darkVkuRed = Color(0xFFFF6B6B);
+  static const Color darkVkuYellow = Color(0xFFFFD93D);
+  static const Color darkVkuNavy = Color(0xFF6C7FD8);
+
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
@@ -547,6 +564,415 @@ class AppTheme {
             return vkuRed;
           }
           return textLight;
+        }),
+      ),
+    );
+  }
+
+  static ThemeData get darkTheme {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      colorScheme: const ColorScheme.dark(
+        primary: darkVkuRed,
+        secondary: darkVkuYellow,
+        tertiary: darkVkuNavy,
+        error: darkVkuRed,
+        onPrimary: Color(0xFF1A1A1A),
+        onSecondary: Color(0xFF1A1A1A),
+        onTertiary: Color(0xFF1A1A1A),
+        onError: Color(0xFF1A1A1A),
+        onSurface: darkTextPrimary,
+        surface: darkSurface,
+        surfaceContainerHighest: darkSurfaceVariant,
+        outline: darkDivider,
+      ),
+      scaffoldBackgroundColor: darkBackground,
+      appBarTheme: const AppBarTheme(
+        backgroundColor: darkSurface,
+        foregroundColor: darkTextPrimary,
+        elevation: 0,
+        centerTitle: true,
+        titleTextStyle: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          fontFamily: 'Roboto',
+          letterSpacing: 0.15,
+          color: darkTextPrimary,
+        ),
+        iconTheme: IconThemeData(
+          size: 24,
+          color: darkTextPrimary,
+        ),
+      ),
+      textTheme: const TextTheme(
+        displayLarge: TextStyle(
+          fontSize: 34,
+          fontWeight: FontWeight.bold,
+          color: darkTextPrimary,
+          fontFamily: 'Roboto',
+          height: 1.25,
+          letterSpacing: -0.5,
+        ),
+        displayMedium: TextStyle(
+          fontSize: 28,
+          fontWeight: FontWeight.bold,
+          color: darkTextPrimary,
+          fontFamily: 'Roboto',
+          height: 1.3,
+          letterSpacing: -0.25,
+        ),
+        displaySmall: TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.w600,
+          color: darkTextPrimary,
+          fontFamily: 'Roboto',
+          height: 1.35,
+          letterSpacing: 0,
+        ),
+        headlineMedium: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          color: darkTextPrimary,
+          fontFamily: 'Roboto',
+          height: 1.4,
+          letterSpacing: 0.15,
+        ),
+        headlineSmall: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: darkTextPrimary,
+          fontFamily: 'Roboto',
+          height: 1.45,
+          letterSpacing: 0.15,
+        ),
+        titleLarge: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: darkTextPrimary,
+          fontFamily: 'Roboto',
+          height: 1.45,
+          letterSpacing: 0.15,
+        ),
+        titleMedium: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+          color: darkTextPrimary,
+          fontFamily: 'Roboto',
+          height: 1.5,
+          letterSpacing: 0.15,
+        ),
+        titleSmall: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: darkTextPrimary,
+          fontFamily: 'Roboto',
+          height: 1.5,
+          letterSpacing: 0.1,
+        ),
+        bodyLarge: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.normal,
+          color: darkTextPrimary,
+          fontFamily: 'Roboto',
+          height: 1.6,
+          letterSpacing: 0.3,
+        ),
+        bodyMedium: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.normal,
+          color: darkTextPrimary,
+          fontFamily: 'Roboto',
+          height: 1.6,
+          letterSpacing: 0.25,
+        ),
+        bodySmall: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.normal,
+          color: darkTextSecondary,
+          fontFamily: 'Roboto',
+          height: 1.55,
+          letterSpacing: 0.3,
+        ),
+        labelLarge: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: darkTextPrimary,
+          fontFamily: 'Roboto',
+          height: 1.45,
+          letterSpacing: 0.1,
+        ),
+        labelMedium: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+          color: darkTextPrimary,
+          fontFamily: 'Roboto',
+          height: 1.45,
+          letterSpacing: 0.4,
+        ),
+        labelSmall: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w500,
+          color: darkTextSecondary,
+          fontFamily: 'Roboto',
+          height: 1.45,
+          letterSpacing: 0.4,
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: darkVkuRed,
+          foregroundColor: darkBackground,
+          padding: const EdgeInsets.symmetric(horizontal: spaceLg, vertical: spaceMd),
+          minimumSize: const Size(88, 48),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(radiusSm),
+          ),
+          elevation: 0,
+          shadowColor: Colors.transparent,
+          textStyle: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.1,
+          ),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: darkVkuRed,
+          side: const BorderSide(color: darkVkuRed, width: 1.5),
+          padding: const EdgeInsets.symmetric(horizontal: spaceLg, vertical: spaceMd),
+          minimumSize: const Size(88, 48),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(radiusSm),
+          ),
+          textStyle: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            letterSpacing: 0.1,
+          ),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: darkVkuRed,
+          padding: const EdgeInsets.symmetric(horizontal: spaceMd, vertical: spaceSm),
+          minimumSize: const Size(48, 48),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(radiusSm),
+          ),
+          textStyle: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            letterSpacing: 0.1,
+          ),
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: darkVkuYellow,
+          foregroundColor: darkBackground,
+          padding: const EdgeInsets.symmetric(horizontal: spaceLg, vertical: spaceMd),
+          minimumSize: const Size(88, 48),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(radiusSm),
+          ),
+          elevation: 0,
+          textStyle: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.1,
+          ),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: darkSurfaceVariant,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(radiusSm),
+          borderSide: const BorderSide(color: darkDivider, width: 1.5),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(radiusSm),
+          borderSide: const BorderSide(color: darkDivider, width: 1.5),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(radiusSm),
+          borderSide: const BorderSide(color: darkVkuRed, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(radiusSm),
+          borderSide: const BorderSide(color: darkVkuRed, width: 1.5),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(radiusSm),
+          borderSide: const BorderSide(color: darkVkuRed, width: 2),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: spaceMd, vertical: spaceMd),
+        hintStyle: const TextStyle(
+          color: darkTextSecondary,
+          fontSize: 14,
+          fontWeight: FontWeight.normal,
+        ),
+        labelStyle: const TextStyle(
+          color: darkTextSecondary,
+          fontSize: 14,
+          fontWeight: FontWeight.normal,
+        ),
+        floatingLabelStyle: const TextStyle(
+          color: darkVkuRed,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      cardTheme: CardThemeData(
+        elevation: 0,
+        shadowColor: Colors.transparent,
+        color: darkCard,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusMd),
+          side: BorderSide(
+            color: darkDivider,
+            width: 1,
+          ),
+        ),
+        margin: const EdgeInsets.symmetric(horizontal: spaceMd, vertical: spaceSm),
+        clipBehavior: Clip.antiAlias,
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: darkSurfaceVariant,
+        deleteIconColor: darkTextSecondary,
+        disabledColor: darkDivider,
+        selectedColor: darkVkuRed.withValues(alpha: 0.2),
+        secondarySelectedColor: darkVkuYellow.withValues(alpha: 0.2),
+        padding: const EdgeInsets.symmetric(horizontal: spaceMd, vertical: spaceSm),
+        labelStyle: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.normal,
+          color: darkTextPrimary,
+        ),
+        secondaryLabelStyle: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.normal,
+          color: darkTextPrimary,
+        ),
+        brightness: Brightness.dark,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusSm),
+        ),
+      ),
+      dividerTheme: const DividerThemeData(
+        color: darkDivider,
+      ),
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: darkSurface,
+        selectedItemColor: darkVkuRed,
+        unselectedItemColor: darkTextSecondary,
+        type: BottomNavigationBarType.fixed,
+        elevation: 0,
+        selectedLabelStyle: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+        unselectedLabelStyle: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.normal,
+        ),
+      ),
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: darkVkuYellow,
+        foregroundColor: darkBackground,
+        elevation: 0,
+        shape: CircleBorder(),
+      ),
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: darkSurfaceVariant,
+        contentTextStyle: const TextStyle(
+          color: darkTextPrimary,
+          fontSize: 14,
+          fontWeight: FontWeight.normal,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusSm),
+        ),
+        behavior: SnackBarBehavior.floating,
+        elevation: elevationMd,
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: darkCard,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusLg),
+          side: const BorderSide(
+            color: darkDivider,
+            width: 1,
+          ),
+        ),
+        titleTextStyle: const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          color: darkTextPrimary,
+          fontFamily: 'Roboto',
+        ),
+        contentTextStyle: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.normal,
+          color: darkTextPrimary,
+          fontFamily: 'Roboto',
+          height: 1.5,
+        ),
+      ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: darkCard,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(radiusLg),
+          ),
+          side: BorderSide(
+            color: darkDivider,
+            width: 1,
+          ),
+        ),
+        clipBehavior: Clip.antiAlias,
+      ),
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: darkVkuRed,
+        circularTrackColor: darkDivider,
+      ),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return darkVkuRed;
+          }
+          return darkTextSecondary;
+        }),
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return darkVkuRed.withValues(alpha: 0.4);
+          }
+          return darkDivider;
+        }),
+      ),
+      checkboxTheme: CheckboxThemeData(
+        fillColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return darkVkuRed;
+          }
+          return Colors.transparent;
+        }),
+        checkColor: WidgetStateProperty.all(darkBackground),
+        side: const BorderSide(color: darkDivider, width: 2),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(4),
+        ),
+      ),
+      radioTheme: RadioThemeData(
+        fillColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return darkVkuRed;
+          }
+          return darkTextSecondary;
         }),
       ),
     );

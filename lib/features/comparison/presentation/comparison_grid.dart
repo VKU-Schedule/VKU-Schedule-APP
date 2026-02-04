@@ -65,6 +65,7 @@ class ComparisonGrid extends StatelessWidget {
   Widget _buildWeeklyGrid(BuildContext context, List<Session> sessions) {
     const days = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
     const periods = 12;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Column(
       children: [
@@ -115,7 +116,11 @@ class ComparisonGrid extends StatelessWidget {
                           height: 30,
                           margin: const EdgeInsets.all(1),
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey[300]!),
+                            border: Border.all(
+                              color: isDark 
+                                  ? const Color(0xFF2F2F2F)
+                                  : const Color(0xFFE0E0E0),
+                            ),
                           ),
                         ),
                       );
@@ -130,12 +135,12 @@ class ComparisonGrid extends StatelessWidget {
                         margin: const EdgeInsets.all(1),
                         decoration: BoxDecoration(
                           color: hasConflict
-                              ? Colors.red[100]
-                              : _getColorForSession(session),
+                              ? (isDark ? const Color(0xFFB71C1C) : const Color(0xFFFFCDD2))
+                              : _getColorForSession(session, isDark),
                           border: Border.all(
                             color: hasConflict
-                                ? Colors.red
-                                : Colors.grey[300]!,
+                                ? (isDark ? const Color(0xFFFF6B6B) : const Color(0xFFD32F2F))
+                                : (isDark ? const Color(0xFF2F2F2F) : const Color(0xFFE0E0E0)),
                             width: hasConflict ? 2 : 1,
                           ),
                           borderRadius: BorderRadius.circular(4),
@@ -146,7 +151,9 @@ class ComparisonGrid extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 8,
                               fontWeight: FontWeight.bold,
-                              color: hasConflict ? Colors.red[900] : null,
+                              color: hasConflict 
+                                  ? (isDark ? const Color(0xFFFFCDD2) : const Color(0xFFB71C1C))
+                                  : null,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -163,16 +170,24 @@ class ComparisonGrid extends StatelessWidget {
     );
   }
 
-  Color _getColorForSession(Session session) {
+  Color _getColorForSession(Session session, bool isDark) {
     // Simple color coding based on subject ID hash
     final hash = session.subjectId.hashCode;
-    final colors = [
-      Colors.blue[100]!,
-      Colors.green[100]!,
-      Colors.orange[100]!,
-      Colors.purple[100]!,
-      Colors.teal[100]!,
+    final lightColors = [
+      const Color(0xFFBBDEFB), // blue[100]
+      const Color(0xFFC8E6C9), // green[100]
+      const Color(0xFFFFE0B2), // orange[100]
+      const Color(0xFFE1BEE7), // purple[100]
+      const Color(0xFFB2DFDB), // teal[100]
     ];
+    final darkColors = [
+      const Color(0xFF1565C0), // blue dark
+      const Color(0xFF2E7D32), // green dark
+      const Color(0xFFE65100), // orange dark
+      const Color(0xFF6A1B9A), // purple dark
+      const Color(0xFF00695C), // teal dark
+    ];
+    final colors = isDark ? darkColors : lightColors;
     return colors[hash.abs() % colors.length];
   }
 }

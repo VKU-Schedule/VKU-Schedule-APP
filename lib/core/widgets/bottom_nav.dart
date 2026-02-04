@@ -54,10 +54,8 @@ class _BottomNavBarState extends State<BottomNavBar>
         return 0;
       case '/options':
         return 1;
-      case '/timetable':
-        return 2;
       case '/settings':
-        return 3;
+        return 2;
       default:
         return 0;
     }
@@ -77,9 +75,6 @@ class _BottomNavBarState extends State<BottomNavBar>
         context.go('/options');
         break;
       case 2:
-        context.go('/timetable');
-        break;
-      case 3:
         context.go('/settings');
         break;
     }
@@ -128,16 +123,10 @@ class _BottomNavBarState extends State<BottomNavBar>
               onTap: () => _onTap(1),
             ),
             _NavItem(
-              icon: Icons.calendar_today_rounded,
-              label: 'Thời khóa',
-              isActive: _currentIndex == 2,
-              onTap: () => _onTap(2),
-            ),
-            _NavItem(
               icon: Icons.settings_rounded,
               label: 'Cài đặt',
-              isActive: _currentIndex == 3,
-              onTap: () => _onTap(3),
+              isActive: _currentIndex == 2,
+              onTap: () => _onTap(2),
             ),
           ],
         ),

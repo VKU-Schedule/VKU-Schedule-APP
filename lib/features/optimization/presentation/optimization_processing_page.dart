@@ -27,12 +27,17 @@ class _OptimizationProcessingPageState
   bool _isCancelled = false;
   int _currentStep = 0;
   double _progress = 0.0;
+  bool _isInitializing = true;
 
   @override
   void initState() {
     super.initState();
-    // Delay optimization to avoid modifying provider during widget build
+    // Reset provider state before starting new optimization
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(optimizationProvider.notifier).reset();
+      setState(() {
+        _isInitializing = false;
+      });
       _startOptimization();
       _simulateProgress();
     });
@@ -157,11 +162,13 @@ class _OptimizationProcessingPageState
       ),
       body: AnimatedGradientBackground(
         child: SafeArea(
-          child: optimizationAsync.when(
-            data: (options) => _buildSuccessState(context, options.length),
-            loading: () => _buildLoadingState(context),
-            error: (error, stack) => _buildErrorState(context, error),
-          ),
+          child: _isInitializing
+              ? _buildLoadingState(context)
+              : optimizationAsync.when(
+                  data: (options) => _buildSuccessState(context, options.length),
+                  loading: () => _buildLoadingState(context),
+                  error: (error, stack) => _buildErrorState(context, error),
+                ),
         ),
       ),
     );
@@ -176,9 +183,11 @@ class _OptimizationProcessingPageState
     ];
 
     return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
       child: Padding(
         padding: const EdgeInsets.all(AppTheme.spaceLg),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(height: AppTheme.spaceXl),
             

@@ -84,13 +84,12 @@ class _OptionsListPageState extends ConsumerState<OptionsListPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surface,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Theme.of(context).dividerColor,
+                        width: 1,
                       ),
-                    ],
+                    ),
                   ),
                   child: Row(
                     children: [
@@ -123,7 +122,7 @@ class _OptionsListPageState extends ConsumerState<OptionsListPage> {
                           ref
                               .read(chosenOptionProvider.notifier)
                               .selectOption(option);
-                          context.go('/timetable');
+                          context.push('/timetable');
                         },
                         onCompare: (List<ScheduleOption> options) {
                           // Store options in comparison provider
@@ -175,13 +174,12 @@ class _OptionsListPageState extends ConsumerState<OptionsListPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surface,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
+                  border: Border(
+                    bottom: BorderSide(
+                      color: Theme.of(context).dividerColor,
+                      width: 1,
                     ),
-                  ],
+                  ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -248,7 +246,7 @@ class _OptionsListPageState extends ConsumerState<OptionsListPage> {
                         ref
                             .read(chosenOptionProvider.notifier)
                             .selectOption(option);
-                        context.go('/timetable');
+                        context.push('/timetable');
                       },
                       onCompare: () {
                         context.push('/compare');
@@ -413,6 +411,7 @@ class _HistoryItemState extends ConsumerState<_HistoryItem> {
   @override
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('dd/MM/yyyy HH:mm');
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -432,7 +431,9 @@ class _HistoryItemState extends ConsumerState<_HistoryItem> {
             ),
             trailing: Icon(
               Icons.history,
-              color: Colors.grey[400],
+              color: isDark 
+                  ? Theme.of(context).colorScheme.onSurface.withOpacity(0.5)
+                  : Colors.grey[400],
             ),
             onTap: _toggleExpand,
           ),
