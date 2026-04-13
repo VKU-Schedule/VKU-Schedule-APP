@@ -4,8 +4,8 @@ class ApiConfig {
   ApiConfig._();
 
   // Base URLs
-  static const String mainApiBaseUrl = 'http://localhost:8001';
-  static const String optimizationApiBaseUrl = 'http://localhost:5000';
+  static const String mainApiBaseUrl = 'http://10.0.3.2:8001';
+  static const String optimizationApiBaseUrl = 'http://10.0.3.2:5000';
 
   // Endpoints
   static const String searchRecommendEndpoint = '/api/search-recommend';

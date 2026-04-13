@@ -28,12 +28,17 @@ class ApiSession {
   });
 
   factory ApiSession.fromJson(Map<String, dynamic> json) {
-    // Helper function to safely convert num (int or double) to int
-    int _toInt(dynamic value) {
+    // Helper function to safely convert various types to int
+    int _toInt(dynamic value, {int defaultValue = 0}) {
+      if (value == null) return defaultValue;
       if (value is int) return value;
       if (value is double) return value.toInt();
       if (value is num) return value.toInt();
-      throw FormatException('Cannot convert $value to int');
+      if (value is String) {
+        if (value.isEmpty) return defaultValue;
+        return int.tryParse(value) ?? double.tryParse(value)?.toInt() ?? defaultValue;
+      }
+      return defaultValue;
     }
 
     return ApiSession(

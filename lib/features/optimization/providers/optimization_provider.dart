@@ -7,13 +7,15 @@ import '../../../models/weights.dart';
 import '../../../services/optimization_service.dart';
 import '../providers/optimization_history_provider.dart';
 
+// Provider to track if optimization is currently running
+final isOptimizingProvider = StateProvider<bool>((ref) => false);
+
 final optimizationProvider =
     AsyncNotifierProvider<OptimizationNotifier, List<ScheduleOption>>(
   () => OptimizationNotifier(),
 );
 
-class OptimizationNotifier
-    extends AsyncNotifier<List<ScheduleOption>> {
+class OptimizationNotifier extends AsyncNotifier<List<ScheduleOption>> {
   @override
   Future<List<ScheduleOption>> build() async {
     return [];
@@ -29,8 +31,9 @@ class OptimizationNotifier
     print('[OptimizationNotifier] optimize() called');
     print('[OptimizationNotifier] Service: ${service.runtimeType}');
     print('[OptimizationNotifier] Subjects: ${selectedSubjects.length}');
-    
-    state = const AsyncValue.loading();
+
+    // Set optimizing flag
+    ref.read(isOptimizingProvider.notifier).state = true;
 
     try {
       print('[OptimizationNotifier] Calling service.optimize()...');
@@ -44,11 +47,15 @@ class OptimizationNotifier
 
       if (onCancelled()) {
         print('[OptimizationNotifier] Optimization was cancelled');
+        ref.read(isOptimizingProvider.notifier).state = false;
         return;
       }
 
       print('[OptimizationNotifier] Setting state to data');
       state = AsyncValue.data(options);
+
+      // Clear optimizing flag
+      ref.read(isOptimizingProvider.notifier).state = false;
 
       // Save to optimization history
       try {
@@ -63,6 +70,10 @@ class OptimizationNotifier
       print('[OptimizationNotifier] ❌ Error occurred!');
       print('[OptimizationNotifier] Error: $error');
       print('[OptimizationNotifier] StackTrace: $stackTrace');
+      
+      // Clear optimizing flag
+      ref.read(isOptimizingProvider.notifier).state = false;
+      
       state = AsyncValue.error(error, stackTrace);
     }
   }

@@ -138,6 +138,7 @@ class _OptimizationProcessingPageState
   @override
   Widget build(BuildContext context) {
     final optimizationAsync = ref.watch(optimizationProvider);
+    final isOptimizing = ref.watch(isOptimizingProvider);
 
     return Scaffold(
       appBar: VKUAppBar(
@@ -157,11 +158,13 @@ class _OptimizationProcessingPageState
       ),
       body: AnimatedGradientBackground(
         child: SafeArea(
-          child: optimizationAsync.when(
-            data: (options) => _buildSuccessState(context, options.length),
-            loading: () => _buildLoadingState(context),
-            error: (error, stack) => _buildErrorState(context, error),
-          ),
+          child: isOptimizing
+              ? _buildLoadingState(context)
+              : optimizationAsync.when(
+                  data: (options) => _buildSuccessState(context, options.length),
+                  loading: () => _buildLoadingState(context),
+                  error: (error, stack) => _buildErrorState(context, error),
+                ),
         ),
       ),
     );

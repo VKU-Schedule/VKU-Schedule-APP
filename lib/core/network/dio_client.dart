@@ -8,13 +8,15 @@ class DioClient {
 
   DioClient({
     String? baseUrl,
+    Duration? connectTimeout,
+    Duration? receiveTimeout,
     this.getAuthToken,
   }) {
     _dio = Dio(
       BaseOptions(
         baseUrl: baseUrl ?? _getDefaultBaseUrl(),
-        connectTimeout: ApiConfig.defaultTimeout,
-        receiveTimeout: ApiConfig.defaultTimeout,
+        connectTimeout: connectTimeout ?? ApiConfig.defaultTimeout,
+        receiveTimeout: receiveTimeout ?? ApiConfig.defaultTimeout,
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -97,15 +99,12 @@ class DioClient {
 
   /// Create a Dio client for optimization requests with longer timeout
   static DioClient createOptimizationClient({String? Function()? getAuthToken}) {
-    final client = DioClient(
+    return DioClient(
       baseUrl: ApiConfig.optimizationApiBaseUrl,
-      getAuthToken: getAuthToken,
-    );
-    client.setTimeouts(
       connectTimeout: ApiConfig.optimizationTimeout,
       receiveTimeout: ApiConfig.optimizationTimeout,
+      getAuthToken: getAuthToken,
     );
-    return client;
   }
 }
 
