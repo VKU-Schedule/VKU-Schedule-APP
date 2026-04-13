@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:vku_schedule/core/config/api_config.dart';
 
 /// Dio client for API requests with interceptors
 class DioClient {
@@ -12,8 +13,8 @@ class DioClient {
     _dio = Dio(
       BaseOptions(
         baseUrl: baseUrl ?? _getDefaultBaseUrl(),
-        connectTimeout: const Duration(seconds: 10),
-        receiveTimeout: const Duration(seconds: 10),
+        connectTimeout: ApiConfig.defaultTimeout,
+        receiveTimeout: ApiConfig.defaultTimeout,
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -85,22 +86,24 @@ class DioClient {
 
   /// Reset timeouts to default
   void resetTimeouts() {
-    _dio.options.connectTimeout = const Duration(seconds: 10);
-    _dio.options.receiveTimeout = const Duration(seconds: 10);
+    _dio.options.connectTimeout = ApiConfig.defaultTimeout;
+    _dio.options.receiveTimeout = ApiConfig.defaultTimeout;
   }
 
   /// Get default base URL
   static String _getDefaultBaseUrl() {
-    // Using actual VKU API endpoints
-    return 'http://20.106.16.223:8001';
+    return ApiConfig.mainApiBaseUrl;
   }
 
   /// Create a Dio client for optimization requests with longer timeout
   static DioClient createOptimizationClient({String? Function()? getAuthToken}) {
-    final client = DioClient(getAuthToken: getAuthToken);
+    final client = DioClient(
+      baseUrl: ApiConfig.optimizationApiBaseUrl,
+      getAuthToken: getAuthToken,
+    );
     client.setTimeouts(
-      connectTimeout: const Duration(seconds: 60),
-      receiveTimeout: const Duration(seconds: 60),
+      connectTimeout: ApiConfig.optimizationTimeout,
+      receiveTimeout: ApiConfig.optimizationTimeout,
     );
     return client;
   }

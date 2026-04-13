@@ -4,6 +4,7 @@ import '../models/weights.dart';
 import '../models/preference_constraints.dart';
 import '../models/optimization_request.dart';
 import 'api_service.dart';
+import '../core/config/api_config.dart';
 
 class OptimizationService {
   final ApiService _apiService;
@@ -49,7 +50,7 @@ class OptimizationService {
     print('========================================');
     print('OPTIMIZATION REQUEST TO SERVER');
     print('========================================');
-    print('Endpoint: http://20.106.16.223:5000/api/convert');
+    print('Endpoint: ${ApiConfig.optimizationApiBaseUrl}${ApiConfig.optimizeEndpoint}');
     print('');
     print('Queries (${queries.length} môn học):');
     for (var i = 0; i < queries.length; i++) {

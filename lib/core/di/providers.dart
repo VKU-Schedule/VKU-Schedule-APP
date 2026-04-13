@@ -8,6 +8,7 @@ import '../../services/local_storage_service.dart';
 import '../../services/auth_service.dart';
 import '../../services/api_service.dart';
 import '../../core/network/dio_client.dart';
+import '../../core/config/api_config.dart';
 
 // Storage Providers
 final sharedPreferencesProvider = FutureProvider<SharedPreferences>((ref) async {
@@ -48,14 +49,13 @@ final dioClientProvider = Provider<DioClient>((ref) {
 });
 
 final optimizationDioClientProvider = Provider<DioClient>((ref) {
-  // Optimization API uses different base URL and longer timeout
   final client = DioClient(
-    baseUrl: 'http://20.106.16.223:5000',
-    getAuthToken: () => null, // API doesn't require auth for now
+    baseUrl: ApiConfig.optimizationApiBaseUrl,
+    getAuthToken: () => null,
   );
   client.setTimeouts(
-    connectTimeout: const Duration(seconds: 60),
-    receiveTimeout: const Duration(seconds: 60),
+    connectTimeout: ApiConfig.optimizationTimeout,
+    receiveTimeout: ApiConfig.optimizationTimeout,
   );
   return client;
 });

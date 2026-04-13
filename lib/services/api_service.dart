@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:vku_schedule/core/config/api_config.dart';
 import 'package:vku_schedule/core/network/dio_client.dart';
 import 'package:vku_schedule/models/api_subject.dart';
 import 'package:vku_schedule/models/optimization_request.dart';
@@ -20,7 +21,7 @@ class ApiService {
   Future<List<ApiSubject>> searchSubjects(String query) async {
     try {
       final response = await _dioClient.instance.post(
-        '/api/search-recommend',
+        ApiConfig.searchRecommendEndpoint,
         data: {'query': query},
       );
 
@@ -94,15 +95,15 @@ class ApiService {
       print('═══════════════════════════════════════════════════════════');
       print('');
       
-      print('[ApiService] Sending POST request to /api/convert');
-      print('[ApiService] Full URL: ${_optimizationClient.instance.options.baseUrl}/api/convert');
+      print('[ApiService] Sending POST request to ${ApiConfig.optimizeEndpoint}');
+      print('[ApiService] Full URL: ${_optimizationClient.instance.options.baseUrl}${ApiConfig.optimizeEndpoint}');
       print('[ApiService] Request data type: ${requestData.runtimeType}');
       print('[ApiService] Request data: $requestData');
       print('[ApiService] Timeout - Connect: ${_optimizationClient.instance.options.connectTimeout?.inSeconds ?? 0}s, Receive: ${_optimizationClient.instance.options.receiveTimeout?.inSeconds ?? 0}s');
       
       print('[ApiService] ⏳ Attempting to send request...');
       final response = await _optimizationClient.instance.post(
-        '/api/convert',
+        ApiConfig.optimizeEndpoint,
         data: requestData,
         options: Options(
           validateStatus: (status) => status! < 500,
