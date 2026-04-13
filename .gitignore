@@ -109,3 +109,5 @@ build/
 # 
 .kiro/
 
+/guardrails_service/.env
+/guardrails_service/.env.example

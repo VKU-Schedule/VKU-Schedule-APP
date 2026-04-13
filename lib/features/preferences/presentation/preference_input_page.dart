@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_bar.dart';
 import '../../../core/widgets/vku_components.dart';
+import '../../../core/di/providers.dart';
+import '../../../core/validation/validation_result.dart';
 import '../providers/preferences_provider.dart';
 
 class PreferenceInputPage extends ConsumerStatefulWidget {
@@ -89,24 +91,205 @@ class _PreferenceInputPageState extends ConsumerState<PreferenceInputPage>
       _errorMessage = null;
     });
 
-    ref.read(preferencesProvider.notifier).updatePromptText(promptText);
+    // Validate prompt using Guardrails service
+    try {
+      final guardrailsService = ref.read(guardrailsServiceProvider);
+      final validationResult = await guardrailsService.validatePrompt(promptText);
 
-    await Future.delayed(const Duration(milliseconds: 500));
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
 
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-      });
+        // Handle validation result
+        if (validationResult.isBlock) {
+          _showValidationDialog(
+            context: context,
+            result: validationResult,
+            canProceed: false,
+          );
+          return;
+        }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Đã lưu sở thích'),
-          backgroundColor: AppTheme.success,
-        ),
-      );
+        if (validationResult.isWarn) {
+          final shouldProceed = await _showValidationDialog(
+            context: context,
+            result: validationResult,
+            canProceed: true,
+          );
+          
+          if (shouldProceed != true) {
+            return;
+          }
+        }
 
-      context.go('/weights');
+        // Save and proceed
+        ref.read(preferencesProvider.notifier).updatePromptText(promptText);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Đã lưu sở thích'),
+            backgroundColor: AppTheme.success,
+          ),
+        );
+
+        context.go('/weights');
+      }
+    } catch (e) {
+      // If guardrails service fails, proceed anyway (fallback)
+      print('[PreferenceInput] Guardrails validation failed: $e');
+      
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+
+        ref.read(preferencesProvider.notifier).updatePromptText(promptText);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Đã lưu sở thích'),
+            backgroundColor: AppTheme.success,
+          ),
+        );
+
+        context.go('/weights');
+      }
     }
+  }
+
+  Future<bool?> _showValidationDialog({
+    required BuildContext context,
+    required ValidationResult result,
+    required bool canProceed,
+  }) {
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: canProceed,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        ),
+        title: Row(
+          children: [
+            Icon(
+              result.isBlock ? Icons.block : Icons.warning_amber_rounded,
+              color: result.isBlock ? AppTheme.error : AppTheme.warning,
+              size: 28,
+            ),
+            const SizedBox(width: AppTheme.spaceSm),
+            Expanded(
+              child: Text(
+                result.isBlock ? 'Không thể tiếp tục' : 'Cảnh báo',
+                style: TextStyle(
+                  color: result.isBlock ? AppTheme.error : AppTheme.warning,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (result.message != null) ...[
+              Text(
+                result.message!,
+                style: const TextStyle(
+                  fontSize: 15,
+                  color: AppTheme.textDark,
+                ),
+              ),
+              const SizedBox(height: AppTheme.spaceMd),
+            ],
+            if (result.issues.isNotEmpty) ...[
+              Container(
+                padding: const EdgeInsets.all(AppTheme.spaceSm),
+                decoration: BoxDecoration(
+                  color: AppTheme.backgroundGrey,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: result.issues.map((issue) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppTheme.spaceXs,
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('• ', style: TextStyle(fontSize: 16)),
+                          Expanded(
+                            child: Text(
+                              issue,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: AppTheme.textMedium,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              const SizedBox(height: AppTheme.spaceMd),
+            ],
+            if (result.suggestion != null) ...[
+              Container(
+                padding: const EdgeInsets.all(AppTheme.spaceSm),
+                decoration: BoxDecoration(
+                  color: AppTheme.vkuYellow.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  border: Border.all(
+                    color: AppTheme.vkuYellow.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(
+                      Icons.lightbulb_outline,
+                      size: 18,
+                      color: AppTheme.vkuYellow800,
+                    ),
+                    const SizedBox(width: AppTheme.spaceSm),
+                    Expanded(
+                      child: Text(
+                        result.suggestion!,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: AppTheme.vkuYellow800,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+        actions: [
+          if (canProceed)
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Tiếp tục'),
+            ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(
+              canProceed ? 'Quay lại' : 'Đóng',
+              style: TextStyle(
+                color: result.isBlock ? AppTheme.error : AppTheme.textMedium,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _insertTemplate(String template) {

@@ -7,6 +7,7 @@ import '../../services/optimization_service.dart';
 import '../../services/local_storage_service.dart';
 import '../../services/auth_service.dart';
 import '../../services/api_service.dart';
+import '../../services/guardrails_service.dart';
 import '../../core/network/dio_client.dart';
 import '../../core/config/api_config.dart';
 
@@ -60,6 +61,18 @@ final optimizationDioClientProvider = Provider<DioClient>((ref) {
   return client;
 });
 
+final guardrailsDioClientProvider = Provider<DioClient>((ref) {
+  final client = DioClient(
+    baseUrl: ApiConfig.guardrailsApiBaseUrl,
+    getAuthToken: () => null,
+  );
+  client.setTimeouts(
+    connectTimeout: ApiConfig.validationTimeout,
+    receiveTimeout: ApiConfig.validationTimeout,
+  );
+  return client;
+});
+
 // API Service Provider
 final apiServiceProvider = Provider<ApiService>((ref) {
   final dioClient = ref.watch(dioClientProvider);
@@ -77,3 +90,9 @@ final subjectRepositoryProvider = Provider<SubjectRepository>((ref) {
 });
 
 
+
+// Guardrails Service Provider (NeMo Guardrails)
+final guardrailsServiceProvider = Provider<GuardrailsService>((ref) {
+  final dioClient = ref.watch(guardrailsDioClientProvider);
+  return GuardrailsService(dioClient: dioClient);
+});

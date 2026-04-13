@@ -1,0 +1,8 @@
+# Colang definitions for VKU Schedule validation rails
+# Để AI tự động phân tích, chỉ cần định nghĩa flow đơn giản
+
+define flow ai validation check
+  # AI sẽ tự động phân tích toàn bộ input dựa trên system prompt chi tiết trong config.yml
+  # Không cần define từng pattern cụ thể - AI sẽ hiểu context và tự phát hiện
+  user ...
+  execute ai_validate_input()
