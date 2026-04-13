@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/widgets/app_bar.dart';
 import '../../../core/widgets/bottom_nav.dart';
@@ -363,6 +364,15 @@ class _WeeklyTimetablePageState extends ConsumerState<WeeklyTimetablePage> {
     return Scaffold(
       appBar: VKUAppBar(
         title: _isEditing ? 'Chỉnh sửa lịch' : 'Lịch tuần',
+        // Show back button only if we can actually pop
+        leading: Navigator.of(context).canPop()
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => Navigator.of(context).pop(),
+                tooltip: 'Quay lại',
+                color: Colors.white,
+              )
+            : null,
         actions: [
           if (_isEditing) ...[
             IconButton(

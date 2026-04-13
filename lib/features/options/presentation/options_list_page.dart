@@ -123,7 +123,7 @@ class _OptionsListPageState extends ConsumerState<OptionsListPage> {
                           ref
                               .read(chosenOptionProvider.notifier)
                               .selectOption(option);
-                          context.go('/timetable');
+                          context.push('/timetable');
                         },
                         onCompare: (List<ScheduleOption> options) {
                           // Store options in comparison provider
@@ -248,7 +248,7 @@ class _OptionsListPageState extends ConsumerState<OptionsListPage> {
                         ref
                             .read(chosenOptionProvider.notifier)
                             .selectOption(option);
-                        context.go('/timetable');
+                        context.push('/timetable');
                       },
                       onCompare: () {
                         context.push('/compare');
